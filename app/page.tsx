@@ -64,30 +64,31 @@ const features = [
   { text: "Secure Payment", icon: <CreditCard className="w-5 h-5 md:w-6 md:h-6 text-yellow-500" />, desc: "SSL Encrypted" },
 ];
 
+
 const discountProducts = [
-  { id: 1, name: "Premium Headphones Pro", price: "₹569", oldPrice: "₹875", discount: "-35%", image: "/api/placeholder/200/200", rating: 4.8, sold: 2340 },
-  { id: 2, name: "Wireless Earbuds Elite", price: "₹685", oldPrice: "₹720", discount: "-5%", image: "/api/placeholder/200/200", rating: 4.5, sold: 1560 },
-  { id: 3, name: "Action Camera 4K Ultra", price: "₹548", oldPrice: "₹1826", discount: "-70%", image: "/api/placeholder/200/200", rating: 4.9, sold: 890 },
-  { id: 4, name: "Smart Watch Series X", price: "₹438", oldPrice: "₹999", discount: "-56%", image: "/api/placeholder/200/200", rating: 4.7, sold: 3200 },
-  { id: 5, name: "Universal Phone Holder", price: "₹593", oldPrice: "₹714", discount: "-17%", image: "/api/placeholder/200/200", rating: 4.3, sold: 4500 },
-  { id: 6, name: "Crystal Diamond Ring", price: "₹796", oldPrice: "₹1250", discount: "-36%", image: "/api/placeholder/200/200", rating: 4.6, sold: 670 },
-  { id: 7, name: "Bluetooth Speaker Bass", price: "₹423", oldPrice: "₹850", discount: "-50%", image: "/api/placeholder/200/200", rating: 4.4, sold: 1890 },
+  { id: 1, name: "Premium Headphones Pro", price: "₹569", oldPrice: "₹875", discount: "-35%", image: "https://loremflickr.com/500/500/headphones", rating: 4.8, sold: 2340 },
+  { id: 2, name: "Wireless Earbuds Elite", price: "₹685", oldPrice: "₹720", discount: "-5%", image: "https://loremflickr.com/500/500/earbuds", rating: 4.5, sold: 1560 },
+  { id: 3, name: "Action Camera 4K Ultra", price: "₹548", oldPrice: "₹1826", discount: "-70%", image: "https://loremflickr.com/500/500/camera", rating: 4.9, sold: 890 },
+  { id: 4, name: "Smart Watch Series X", price: "₹438", oldPrice: "₹999", discount: "-56%", image: "https://loremflickr.com/500/500/smartwatch", rating: 4.7, sold: 3200 },
+  { id: 5, name: "Universal Phone Holder", price: "₹593", oldPrice: "₹714", discount: "-17%", image: "https://loremflickr.com/500/500/phoneholder", rating: 4.3, sold: 4500 },
+  { id: 6, name: "Crystal Diamond Ring", price: "₹796", oldPrice: "₹1250", discount: "-36%", image: "https://loremflickr.com/500/500/diamondring", rating: 4.6, sold: 670 },
+  { id: 7, name: "Bluetooth Speaker Bass", price: "₹423", oldPrice: "₹850", discount: "-50%", image: "https://loremflickr.com/500/500/speaker", rating: 4.4, sold: 1890 },
 ];
 
 const flashDeals = [
-  { id: 1, name: "Designer Handbag", price: "₹1,499", oldPrice: "₹3,999", discount: "-62%", image: "/api/placeholder/200/200", rating: 4.9, stock: 12 },
-  { id: 2, name: "Mechanical Keyboard RGB", price: "₹2,199", oldPrice: "₹4,500", discount: "-51%", image: "/api/placeholder/200/200", rating: 4.8, stock: 8 },
-  { id: 3, name: "Yoga Mat Premium", price: "₹449", oldPrice: "₹899", discount: "-50%", image: "/api/placeholder/200/200", rating: 4.7, stock: 25 },
-  { id: 4, name: "Electric Kettle Smart", price: "₹899", oldPrice: "₹1,799", discount: "-50%", image: "/api/placeholder/200/200", rating: 4.6, stock: 15 },
-  { id: 5, name: "Portable Charger 20000mAh", price: "₹1,299", oldPrice: "₹2,599", discount: "-50%", image: "/api/placeholder/200/200", rating: 4.5, stock: 30 },
-  { id: 6, name: "Bluetooth Neckband Pro", price: "₹599", oldPrice: "₹1,299", discount: "-54%", image: "/api/placeholder/200/200", rating: 4.4, stock: 18 },
+  { id: 1, name: "Designer Handbag", price: "₹1,499", oldPrice: "₹3,999", discount: "-62%", image: "https://loremflickr.com/500/500/handbag", rating: 4.9, stock: 12 },
+  { id: 2, name: "Mechanical Keyboard RGB", price: "₹2,199", oldPrice: "₹4,500", discount: "-51%", image: "https://loremflickr.com/500/500/keyboard", rating: 4.8, stock: 8 },
+  { id: 3, name: "Yoga Mat Premium", price: "₹449", oldPrice: "₹899", discount: "-50%", image: "https://loremflickr.com/500/500/yogamat", rating: 4.7, stock: 25 },
+  { id: 4, name: "Electric Kettle Smart", price: "₹899", oldPrice: "₹1,799", discount: "-50%", image: "https://loremflickr.com/500/500/kettle", rating: 4.6, stock: 15 },
+  { id: 5, name: "Portable Charger 20000mAh", price: "₹1,299", oldPrice: "₹2,599", discount: "-50%", image: "https://loremflickr.com/500/500/powerbank", rating: 4.5, stock: 30 },
+  { id: 6, name: "Bluetooth Neckband Pro", price: "₹599", oldPrice: "₹1,299", discount: "-54%", image: "https://loremflickr.com/500/500/neckband", rating: 4.4, stock: 18 },
 ];
 
 const featuredProducts = [
-  { id: 1, name: "Industrial CNC Machine", price: "₹85,000", category: "Machinery", seller: "Precision Tools India", verified: true, rating: 4.9, orders: 156 },
-  { id: 2, name: "Organic Cotton Fabric Roll", price: "₹2,500/meter", category: "Textiles", seller: "Gujarat Textiles", verified: true, rating: 4.7, orders: 890 },
-  { id: 3, name: "Solar Panel 400W", price: "₹18,500", category: "Electronics", seller: "EcoEnergy Systems", verified: true, rating: 4.8, orders: 340 },
-  { id: 4, name: "Stainless Steel Pipes", price: "₹450/kg", category: "Industrial", seller: "Metro Steel Works", verified: true, rating: 4.6, orders: 2100 },
+  { id: 1, name: "Industrial CNC Machine", price: "₹85,000", category: "Machinery", seller: "Precision Tools India", verified: true, rating: 4.9, orders: 156, image: "https://loremflickr.com/500/500/machine" },
+  { id: 2, name: "Organic Cotton Fabric Roll", price: "₹2,500/meter", category: "Textiles", seller: "Gujarat Textiles", verified: true, rating: 4.7, orders: 890, image: "https://loremflickr.com/500/500/fabric" },
+  { id: 3, name: "Solar Panel 400W", price: "₹18,500", category: "Electronics", seller: "EcoEnergy Systems", verified: true, rating: 4.8, orders: 340, image: "https://loremflickr.com/500/500/solarpanel" },
+  { id: 4, name: "Stainless Steel Pipes", price: "₹450/kg", category: "Industrial", seller: "Metro Steel Works", verified: true, rating: 4.6, orders: 2100, image: "https://loremflickr.com/500/500/steelpipes" },
 ];
 
 const categories = [
@@ -103,7 +104,7 @@ const infoCards = [
     title: "About SPYAJ",
     icon: <ShoppingBag className="w-10 h-10 md:w-12 md:h-12 text-primary" />,
     description: "Wholesale products from certified sellers",
-    subtext: "Worldwide shipping | Low prices from US $0.1",
+    subtext: "Worldwide shipping | Low prices from ₹500",
     link: "Learn More >>",
     href: "/about"
   },
@@ -536,9 +537,14 @@ function ProductCard({ product, showDiscount, showStock }: { product: any, showD
     >
       <div className="aspect-square bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
         <motion.div
-          className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10"
         />
-        <span className="text-muted-foreground/30 font-bold text-xs">{product.image?.replace("/api/placeholder/200/200", "Image")}</span>
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
+        />
         {showDiscount && (
           <motion.div
             initial={{ scale: 0 }}
@@ -593,8 +599,13 @@ function FeaturedProductCard({ product }: { product: any }) {
       whileHover={{ y: -8, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
       className="bg-background border-2 border-border rounded-lg md:rounded-xl overflow-hidden hover:border-primary/50 transition-all group cursor-pointer"
     >
-      <div className="aspect-square bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center border-b-2 border-border relative overflow-hidden">
-        <span className="text-muted-foreground/30 font-bold text-xs md:text-base">{product.category}</span>
+      <div className="aspect-square bg-white flex items-center justify-center border-b-2 border-border relative overflow-hidden">
+        <Image
+          src={product.image || "https://loremflickr.com/500/500/industrial"}
+          alt={product.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
+        />
         <motion.div
           className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"
         />
@@ -656,7 +667,7 @@ function CategoryCarousel({ category }: { category: any }) {
       name: `${category.name} Product ${i + 1}`,
       price: `₹${(500 + Math.floor(priceBase * 9500))}`,
       seller: "Verified Seller",
-      image: category.name,
+      image: `https://loremflickr.com/500/500/${category.name.toLowerCase().replace(/[^a-z]/g, '')}`,
       rating: (4 + ratingBase * 1).toFixed(1),
       sold: Math.floor(50 + soldBase * 500)
     };
@@ -718,8 +729,14 @@ function HorizontalProductCard({ product, index }: { product: any, index: number
       whileHover={{ y: -5, boxShadow: "0 15px 30px rgba(0,0,0,0.1)" }}
       className="flex-shrink-0 w-[280px] md:w-[350px] bg-background border-2 border-border rounded-lg md:rounded-xl p-2.5 md:p-3 hover:border-primary/50 transition-all group cursor-pointer flex gap-2.5 md:gap-3"
     >
-      <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 relative overflow-hidden">
-        <span className="text-muted-foreground/30 font-bold text-[10px] md:text-xs text-center">{product.image}</span>
+      <div className="w-16 h-16 md:w-24 md:h-24 bg-white rounded-lg flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          className="object-cover"
+        />
+        <span className="text-muted-foreground/30 font-bold text-[10px] md:text-xs text-center sr-only">{product.image}</span>
         <motion.div
           className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
         />

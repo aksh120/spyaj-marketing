@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { Search, Filter, SlidersHorizontal, Grid, List as ListIcon, ChevronDown, CheckCircle2, X, Star, Heart, ShoppingCart, Eye, TrendingUp, Sparkles } from "lucide-react";
 import { cn, slugify } from "@/lib/utils";
+import Image from "next/image";
 import { useRef } from "react";
 
 const fadeInUp = {
@@ -23,15 +24,15 @@ const scaleIn = {
 };
 
 const products = [
-    { id: 1, name: "Industrial Grade Steel Pipes", seller: "Global Metals Co.", price: "₹1,200", category: "Industrial", rating: 4.8, reviews: 234, image: "Steel Pipes", orders: 1520, badge: "Best Seller" },
-    { id: 2, name: "Premium Solar Panels 400W", seller: "EcoEnergy Systems", price: "₹18,500", category: "Electronics", rating: 4.9, reviews: 512, image: "Solar Panel", orders: 890, badge: "Top Rated" },
-    { id: 3, name: "Wholesale Cotton Fabric", seller: "Textile Hub", price: "₹150/yard", category: "Fashion", rating: 4.5, reviews: 178, image: "Cotton Fabric", orders: 3200, badge: null },
-    { id: 4, name: "High-Performance Drill Press", seller: "Precision Tools", price: "₹8,900", category: "Industrial", rating: 4.7, reviews: 89, image: "Drill Press", orders: 450, badge: "New" },
-    { id: 5, name: "Lithium-Ion Battery Packs", seller: "Volt Solutions", price: "₹21,000", category: "Electronics", rating: 4.6, reviews: 267, image: "Battery Pack", orders: 780, badge: null },
-    { id: 6, name: "Agricultural Fertilizer Bulk", seller: "GreenAgro Ltd", price: "₹1,200/bag", category: "Raw Materials", rating: 4.4, reviews: 156, image: "Fertilizer", orders: 2100, badge: "Popular" },
-    { id: 7, name: "CNC Machining Parts", seller: "Metro Engineering", price: "₹5,500", category: "Industrial", rating: 4.8, reviews: 445, image: "CNC Parts", orders: 1200, badge: null },
-    { id: 8, name: "Organic Spices Collection", seller: "Spice Valley", price: "₹850/kg", category: "Raw Materials", rating: 4.9, reviews: 623, image: "Spices", orders: 4500, badge: "Trending" },
-    { id: 9, name: "LED Display Screens", seller: "Visual Tech", price: "₹45,000", category: "Electronics", rating: 4.7, reviews: 178, image: "LED Screen", orders: 320, badge: null },
+    { id: 1, name: "Industrial Air Compressor", seller: "Machinery World", price: "₹1,25,000", category: "Industrial", rating: 4.8, reviews: 124, image: "https://loremflickr.com/500/500/compressor", orders: 450, badge: "Best Seller" },
+    { id: 2, name: "Heavy Duty Welding Machine", seller: "WeldPower Systems", price: "₹18,500", category: "Industrial", rating: 4.6, reviews: 89, image: "https://loremflickr.com/500/500/welding", orders: 280, badge: null },
+    { id: 3, name: "Organic Cotton Yarn", seller: "Textile Hub", price: "₹450", category: "Fashion", rating: 4.9, reviews: 312, image: "https://loremflickr.com/500/500/yarn", orders: 1200, badge: "Top Rated" },
+    { id: 4, name: "Solar Panel Monocrystalline", seller: "Green Energy Solutions", price: "₹12,000", category: "Electronics", rating: 4.7, reviews: 156, image: "https://loremflickr.com/500/500/solarpanel", orders: 560, badge: "Trending" },
+    { id: 5, name: "Hydraulic Pump Unit", seller: "Fluid Tech", price: "₹35,000", category: "Industrial", rating: 4.5, reviews: 45, image: "https://loremflickr.com/500/500/hydraulicpump", orders: 120, badge: null },
+    { id: 6, name: "Polyester Fabric Roll", seller: "FabTex India", price: "₹120/m", category: "Raw Materials", rating: 4.4, reviews: 230, image: "https://loremflickr.com/500/500/fabric", orders: 3400, badge: "Popular" },
+    { id: 7, name: "Microcontroller Board", seller: "Chipset Electronics", price: "₹450", category: "Electronics", rating: 4.8, reviews: 567, image: "https://loremflickr.com/500/500/microcontroller", orders: 890, badge: "New" },
+    { id: 8, name: "Steel Pipes Schedule 40", seller: "Metal Works Corp", price: "₹85/kg", category: "Raw Materials", rating: 4.6, reviews: 67, image: "https://loremflickr.com/500/500/steelpipes", orders: 8900, badge: null },
+    { id: 9, name: "LED Display Screens", seller: "Visual Tech", price: "₹45,000", category: "Electronics", rating: 4.7, reviews: 178, image: "https://loremflickr.com/500/500/ledscreen", orders: 320, badge: null },
 ];
 
 const categories = [
@@ -51,7 +52,7 @@ const sortOptions = [
     { value: "orders", label: "Most Orders" },
 ];
 
-export default function Marketplace() {
+function MarketplaceContent() {
     const searchParams = useSearchParams();
     const [selectedCategory, setSelectedCategory] = useState("All");
 
@@ -353,8 +354,19 @@ export default function Marketplace() {
                                     )}
                                 >
                                     <div className="aspect-square bg-gradient-to-br from-primary/5 via-muted/30 to-primary/10 relative overflow-hidden border-b-2 border-border">
-                                        <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30 italic font-semibold text-xs md:text-base">
-                                            {product.image}
+                                        <div className="absolute inset-0 flex items-center justify-center bg-white">
+                                            {product.image.startsWith("http") ? (
+                                                <Image
+                                                    src={product.image || "https://loremflickr.com/500/500/industrial"}
+                                                    alt={product.name}
+                                                    fill
+                                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                                />
+                                            ) : (
+                                                <div className="text-muted-foreground/30 italic font-semibold text-xs md:text-base">
+                                                    {product.image}
+                                                </div>
+                                            )}
                                         </div>
 
                                         {product.badge && (
@@ -483,5 +495,13 @@ export default function Marketplace() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function Marketplace() {
+    return (
+        <Suspense fallback={<div className="min-h-screen pt-24 flex items-center justify-center">Loading...</div>}>
+            <MarketplaceContent />
+        </Suspense>
     );
 }
