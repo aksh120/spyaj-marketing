@@ -16,8 +16,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "SPYAJ Marketing | Best B2B Marketplace",
-    description: "Spy aj marketing is best. Discover modern, secure, and scalable B2B marketplace for global trade.",
+    title: "SPYAJ Marketing | Connect. Trade. Grow.",
+    description: "Connect. Trade. Grow. Discover modern, secure, and scalable B2B marketplace for global trade.",
+    icons: {
+        icon: "/logo.png",
+    },
+    openGraph: {
+        images: ["/logo.png"],
+    },
 };
 
 export default function RootLayout({

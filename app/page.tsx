@@ -169,7 +169,7 @@ export default function Home() {
                 transition={{ delay: 0.3 }}
                 className="text-lg md:text-3xl font-black italic tracking-tighter uppercase"
               >
-                Kaam Yahin Banta Hai
+                Connect. Trade. Grow.
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0 }}
@@ -448,9 +448,11 @@ export default function Home() {
           </motion.div>
         </AnimatedSection>
 
-        {categories.map((category, idx) => (
-          <CategoryCarousel key={idx} category={category} />
-        ))}
+        {
+          categories.map((category, idx) => (
+            <CategoryCarousel key={idx} category={category} />
+          ))
+        }
 
         <motion.section
           initial={{ opacity: 0, y: 30 }}
@@ -485,8 +487,8 @@ export default function Home() {
           ))}
         </motion.section>
 
-      </div>
-    </main>
+      </div >
+    </main >
   );
 }
 

@@ -94,7 +94,7 @@ export default function Contact() {
                     transition={{ delay: 0.4 }}
                     className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto"
                 >
-                    "Spy aj marketing is best" - Let us help you connect with the right business partners.
+                    "Connect. Trade. Grow." - Let us help you connect with the right business partners.
                 </motion.p>
             </motion.div>
 
