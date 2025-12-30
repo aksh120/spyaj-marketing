@@ -68,13 +68,13 @@ export default function Navbar() {
         >
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 md:gap-6">
                 <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
-                    <div className="relative h-10 w-auto aspect-video">
+                    <div className="relative h-12 md:h-16 w-auto aspect-video">
                         <Image
                             src={mounted ? (resolvedTheme === "dark" ? "/logo-dark.png" : "/logo-light.png") : "/logo-light.png"}
                             alt="SPYAJ Marketing"
-                            width={150}
+                            width={200}
                             height={60}
-                            className="h-10 w-auto object-contain"
+                            className="h-12 md:h-16 w-auto object-contain"
                             onError={() => setImgError(true)}
                             priority
                         />

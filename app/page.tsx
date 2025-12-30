@@ -11,6 +11,8 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
+import { slugify } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -50,9 +52,9 @@ const sideCategories = [
 ];
 
 const carouselSlides = [
-  { title: "Direct from Manufacturers", subtitle: "Connect with global sellers directly for best pricing.", color: "from-blue-600 to-yellow-500", badge: "New" },
-  { title: "Smart Sourcing Solutions", subtitle: "Find the best raw materials for your production.", color: "from-emerald-600 to-teal-700", badge: "Popular" },
-  { title: "Global Logistics Network", subtitle: "Reliable shipping to over 200 countries worldwide.", color: "from-orange-600 to-red-700", badge: "Trending" },
+  { title: "Direct from Manufacturers", subtitle: "Connect with global sellers directly for best pricing.", color: "from-blue-900 via-blue-700 to-yellow-600", badge: "New", icon: <Factory className="w-full h-full" /> },
+  { title: "Smart Sourcing Solutions", subtitle: "Find the best raw materials for your production.", color: "from-emerald-900 via-green-800 to-teal-600", badge: "Popular", icon: <Sprout className="w-full h-full" /> },
+  { title: "Global Logistics Network", subtitle: "Reliable shipping to over 200 countries worldwide.", color: "from-orange-800 via-red-800 to-red-600", badge: "Trending", icon: <Globe className="w-full h-full" /> },
 ];
 
 const features = [
@@ -102,21 +104,24 @@ const infoCards = [
     icon: <ShoppingBag className="w-10 h-10 md:w-12 md:h-12 text-primary" />,
     description: "Wholesale products from certified sellers",
     subtext: "Worldwide shipping | Low prices from US $0.1",
-    link: "Learn More >>"
+    link: "Learn More >>",
+    href: "/about"
   },
   {
     title: "Buyers FAQ",
     icon: <FileQuestion className="w-10 h-10 md:w-12 md:h-12 text-primary" />,
     description: "How do I contact the seller?",
     subtext: "How do I make a payment? | How do I calculate shipping cost?",
-    link: "Learn More >>"
+    link: "Learn More >>",
+    href: "/buyers-faq"
   },
   {
     title: "Buyer Protection",
     icon: <Lock className="w-10 h-10 md:w-12 md:h-12 text-primary" />,
     description: "Secure payments",
     subtext: "Guaranteed refunds | Escrow protection on every order",
-    link: "Learn More >>"
+    link: "Learn More >>",
+    href: "/buyers-protection"
   },
 ];
 
@@ -155,7 +160,7 @@ export default function Home() {
           transition={{ duration: 0.6 }}
           className="relative w-full h-[80px] md:h-[120px] rounded-xl md:rounded-2xl overflow-hidden border-2 border-border shadow-lg group"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-primary via-blue-600 to-yellow-500" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary via-blue-600 to-yellow-600" />
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
             animate={{ x: ["-100%", "100%"] }}
@@ -212,7 +217,7 @@ export default function Home() {
               {sideCategories.map((cat, idx) => (
                 <motion.div key={cat.name} variants={staggerItem}>
                   <Link
-                    href="/marketplace"
+                    href={`/marketplace?category=${slugify(cat.name)}`}
                     className="flex items-center justify-between p-2 md:p-2.5 rounded-lg md:rounded-xl hover:bg-primary/5 hover:text-primary transition-all group border border-transparent hover:border-primary/10 flex-shrink-0"
                   >
                     <div className="flex items-center gap-2 md:gap-3">
@@ -239,54 +244,70 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex-1 relative rounded-xl md:rounded-2xl overflow-hidden shadow-lg border-2 border-border group min-h-[250px] md:min-h-[350px] lg:min-h-0"
           >
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
               <motion.div
                 key={currentSlide}
                 initial={{ opacity: 0, scale: 1.1 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
+                exit={{ opacity: 0, scale: 1.1 }}
                 transition={{ duration: 0.7 }}
-                className={`absolute inset-0 bg-gradient-to-br ${carouselSlides[currentSlide].color} p-6 md:p-12 lg:p-16 flex flex-col justify-center`}
+                className={`absolute inset-0 bg-gradient-to-br ${carouselSlides[currentSlide].color} p-6 md:p-12 lg:p-16 flex items-center overflow-hidden`}
               >
+                {/* Background Pattern */}
+                <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-125 filter contrast-125 mix-blend-overlay"></div>
+
+                {/* Large Background Icon */}
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-white text-xs font-bold"
+                  initial={{ opacity: 0, x: 100, rotate: 20 }}
+                  animate={{ opacity: 0.15, x: 0, rotate: -15 }}
+                  exit={{ opacity: 0, x: 100, rotate: 20 }}
+                  transition={{ duration: 0.8 }}
+                  className="absolute -right-20 -bottom-20 md:right-10 md:-bottom-20 w-[300px] h-[300px] md:w-[600px] md:h-[600px] text-white pointer-events-none"
                 >
-                  {carouselSlides[currentSlide].badge}
+                  {carouselSlides[currentSlide].icon}
                 </motion.div>
-                <motion.h2
-                  initial={{ y: 30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                  className="text-2xl md:text-4xl lg:text-6xl font-black text-white mb-3 md:mb-6 leading-[1.1]"
-                >
-                  {carouselSlides[currentSlide].title}
-                </motion.h2>
-                <motion.p
-                  initial={{ y: 30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.4, duration: 0.5 }}
-                  className="text-sm md:text-xl lg:text-2xl text-white/80 max-w-xl mb-4 md:mb-10"
-                >
-                  {carouselSlides[currentSlide].subtitle}
-                </motion.p>
-                <motion.div
-                  initial={{ y: 30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                >
-                  <Link href="/marketplace">
-                    <motion.button
-                      whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}
-                      whileTap={{ scale: 0.95 }}
-                      className="inline-flex items-center gap-2 bg-white text-black px-4 md:px-8 py-2 md:py-4 rounded-lg md:rounded-xl text-sm md:text-base font-bold shadow-xl"
-                    >
-                      Explore Now <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
-                    </motion.button>
-                  </Link>
-                </motion.div>
+
+                <div className="relative z-10 max-w-3xl">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="inline-block bg-white/20 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-white text-xs md:text-sm font-bold mb-4 shadow-sm"
+                  >
+                    ✨ {carouselSlides[currentSlide].badge}
+                  </motion.div>
+                  <motion.h2
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.3, duration: 0.5 }}
+                    className="text-3xl md:text-5xl lg:text-7xl font-black text-white mb-4 md:mb-6 leading-[1.1] tracking-tight drop-shadow-sm"
+                  >
+                    {carouselSlides[currentSlide].title}
+                  </motion.h2>
+                  <motion.p
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                    className="text-white/90 text-sm md:text-xl lg:text-2xl font-medium max-w-xl mb-6 md:mb-10 drop-shadow-sm leading-relaxed"
+                  >
+                    {carouselSlides[currentSlide].subtitle}
+                  </motion.p>
+                  <motion.div
+                    initial={{ y: 30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.5, duration: 0.5 }}
+                  >
+                    <Link href="/marketplace">
+                      <motion.button
+                        whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.3)" }}
+                        whileTap={{ scale: 0.95 }}
+                        className="inline-flex items-center gap-2 bg-white text-black px-6 md:px-10 py-3 md:py-4 rounded-xl text-sm md:text-lg font-bold shadow-xl hover:bg-gray-50 transition-colors"
+                      >
+                        Explore Now <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
+                      </motion.button>
+                    </Link>
+                  </motion.div>
+                </div>
               </motion.div>
             </AnimatePresence>
 
@@ -480,7 +501,7 @@ export default function Home() {
               <h3 className="text-base md:text-xl font-bold mb-2 md:mb-3">{card.title}</h3>
               <p className="text-xs md:text-sm text-muted-foreground mb-1 md:mb-2">{card.description}</p>
               <p className="text-xs text-muted-foreground mb-3 md:mb-4">{card.subtext}</p>
-              <Link href="/contact" className="text-xs md:text-sm font-bold text-primary hover:underline inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+              <Link href={card.href} className="text-xs md:text-sm font-bold text-primary hover:underline inline-flex items-center gap-1 group-hover:gap-2 transition-all">
                 {card.link}
               </Link>
             </motion.div>
@@ -673,7 +694,7 @@ function CategoryCarousel({ category }: { category: any }) {
           >
             <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
           </motion.button>
-          <Link href="/marketplace" className="ml-1 md:ml-2 text-xs md:text-sm font-bold text-primary hover:underline hidden sm:block">
+          <Link href={`/marketplace?category=${slugify(category.name)}`} className="ml-1 md:ml-2 text-xs md:text-sm font-bold text-primary hover:underline hidden sm:block">
             View All
           </Link>
         </div>

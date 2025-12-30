@@ -16,17 +16,15 @@ const footerLinks = {
         { label: "All Categories", href: "/marketplace" },
     ],
     resources: [
-        { label: "Become a Seller", href: "/seller" },
+        { label: "Become a Seller", href: "/seller-onboarding" },
         { label: "Help Center", href: "/contact" },
         { label: "Contact Support", href: "/contact" },
-        { label: "Community Forum", href: "/contact" },
-        { label: "Success Stories", href: "/contact" },
+        { label: "Community Forum", href: "/forum" },
     ],
     company: [
-        { label: "About Us", href: "/contact" },
-        { label: "Careers", href: "/contact" },
-        { label: "Press & Media", href: "/contact" },
-        { label: "Blog", href: "/contact" },
+        { label: "About Us", href: "/about" },
+        { label: "Careers", href: "/careers" },
+        { label: "Blog", href: "/blog" },
     ],
 };
 
@@ -251,10 +249,15 @@ export default function Footer() {
                 >
                     <p>© 2025 SPYAJ Marketing Pvt. Ltd. All rights reserved.</p>
                     <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-                        {["Privacy Policy", "Terms of Service", "Cookie Settings", "Sitemap"].map((item, idx) => (
+                        {[
+                            { label: "Privacy Policy", href: "/privacy-policy" },
+                            { label: "Terms of Service", href: "/terms-of-service" },
+                            { label: "Cookie Settings", href: "#" },
+                            { label: "Sitemap", href: "/sitemap" }
+                        ].map((item, idx) => (
                             <motion.div key={idx} whileHover={{ y: -2 }}>
-                                <Link href="#" className="hover:text-primary transition-colors">
-                                    {item}
+                                <Link href={item.href} className="hover:text-primary transition-colors">
+                                    {item.label}
                                 </Link>
                             </motion.div>
                         ))}

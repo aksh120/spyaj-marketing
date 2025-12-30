@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
     title: "SPYAJ Marketing | Connect. Trade. Grow.",
     description: "Connect. Trade. Grow. Discover modern, secure, and scalable B2B marketplace for global trade.",
     icons: {

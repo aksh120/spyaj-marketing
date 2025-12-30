@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { Search, Filter, SlidersHorizontal, Grid, List as ListIcon, ChevronDown, CheckCircle2, X, Star, Heart, ShoppingCart, Eye, TrendingUp, Sparkles } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, slugify } from "@/lib/utils";
 import { useRef } from "react";
 
 const fadeInUp = {
@@ -33,7 +34,14 @@ const products = [
     { id: 9, name: "LED Display Screens", seller: "Visual Tech", price: "₹45,000", category: "Electronics", rating: 4.7, reviews: 178, image: "LED Screen", orders: 320, badge: null },
 ];
 
-const categories = ["All", "Industrial", "Electronics", "Fashion", "Raw Materials"];
+const categories = [
+    "All",
+    "Industrial", "Electronics", "Fashion", "Raw Materials",
+    "Health & Beauty", "Apparel & Fashion", "Chemicals", "Machinery",
+    "Construction & Real Estate", "Electronics & Electricity", "Hospital & Medical",
+    "Gifts & Crafts", "Packaging & Paper", "Agriculture", "Home Supplies",
+    "Mineral & Metals", "Industrial Supplies", "Pipes, Tubes & Fittings"
+];
 
 const sortOptions = [
     { value: "recommended", label: "Recommended" },
@@ -44,7 +52,16 @@ const sortOptions = [
 ];
 
 export default function Marketplace() {
+    const searchParams = useSearchParams();
     const [selectedCategory, setSelectedCategory] = useState("All");
+
+    useEffect(() => {
+        const categorySlug = searchParams.get("category");
+        if (categorySlug) {
+            const foundCategory = categories.find(c => slugify(c) === categorySlug);
+            if (foundCategory) setSelectedCategory(foundCategory);
+        }
+    }, [searchParams]);
     const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState("recommended");
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -55,7 +72,12 @@ export default function Marketplace() {
     const isInView = useInView(containerRef, { once: true });
 
     const filteredProducts = products
-        .filter(p => (selectedCategory === "All" || p.category === selectedCategory))
+        .filter(p => (
+            selectedCategory === "All" ||
+            p.category === selectedCategory ||
+            p.category.includes(selectedCategory) ||
+            selectedCategory.includes(p.category)
+        ))
         .filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
         .sort((a, b) => {
             if (sortBy === "price-low") return parseInt(a.price.replace(/[^\d]/g, "")) - parseInt(b.price.replace(/[^\d]/g, ""));
