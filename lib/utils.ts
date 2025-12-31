@@ -1,17 +1,16 @@
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs));
 }
 
 export function slugify(str: string) {
-    return str
-        .toLowerCase()
-        .replace(/ & /g, "-and-")
-        .replace(/&/g, "-and-") // handle & without spaces
-        .replace(/,/g, "") // remove commas
-        .replace(/\s+/g, "-") // replace spaces with -
-        .replace(/-+/g, "-") // collapse multiple -
-        .replace(/^-|-$/g, ""); // trim -
+  return str
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^\w\s-]/g, "") // remove non-word chars
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
 }

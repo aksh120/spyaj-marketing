@@ -7,24 +7,38 @@ Spyaj Marketing is a next-generation B2B marketplace platform designed to connec
 ## 🚀 Key Features
 
 ### 🌟 Premium User Experience
+
 - **Modern UI/UX**: Designed with a "Premium & Trust" aesthetic using OKLCH color spaces, glassmorphism effects, and fluid transitions.
 - **Fluid Animations**: Powered by `framer-motion` for engaging micro-interactions, page transitions, and scroll effects.
 - **Responsive Design**: Fully optimized for desktops, tablets, and mobile devices.
 
 ### 🛍️ B2B Marketplace
+
 - **Dynamic Product Listings**: Browse thousands of industrial products (Steel, Electronics, Raw Materials, etc.).
 - **Smart Search & Filtering**: advanced filtering by category, price range, and sorting options.
 - **City Search**: Comprehensive city selector in the navbar covering major Indian cities.
 - **Mock Data Engine**: Deterministic mock data generation for stable and realistic product pricing and stats.
 
 ### 🏢 Seller & User Ecosystem
+
 - **Seller Profiles**: Dedicated seller pages with verification badges, ratings, product catalogs, and trust indicators.
 - **User Dashboard**: Comprehensive account management with activity feeds, analytics previews, and saved items.
 - **Verification System**: Visual indicators for verified sellers and secure transactions.
 
 ### 🔐 Authentication & Security
+
 - **Streamlined Auth**: Optimized Sign-In and Sign-Up pages tailored for Google Authentication.
 - **Security First**: UI elements emphasizing trust and safety (HTTPS, verified types).
+
+### 🌐 New Advanced Features
+
+- **Intelligent RFQ System**: Dedicated hub for posting detailed buy requests with features for bulk sourcing.
+- **Dynamic Product Details Page (PDP)**: Rich product presentations with tiered pricing, specification tabs, and 3D view placeholders.
+- **Interactive Sourcing Map**: Visual interface to find and connect with suppliers based on geographical location.
+- **Seller Microsites**: Brand-focused storefronts with custom banners, About Us stories, and product collections.
+- **Enhanced Trust Profiles**: Detailed seller transparency with Verified Tier badges, Response/Delivery metrics, and Factory Tour capability.
+- **Smart Trade Assistant**: Global widget with Real-Time Chat and an AI Assistant to guide sourcing decisions.
+- **Localized Experience**: Full currency localization (INR ₹) and regional data optimization.
 
 ## 🛠️ Tech Stack
 
@@ -64,6 +78,9 @@ spyaj-marketing/
 │   ├── auth/             # Authentication (Sign In/Up)
 │   ├── contact/          # Contact & Support
 │   ├── marketplace/      # Product Listing Page
+│   ├── product/          # Dynamic Product Details (PDP)
+│   ├── rfq/              # Request for Quotation
+│   ├── sourcing-map/     # Sourcing Map
 │   ├── seller/           # Seller Profile Page
 │   ├── globals.css       # Global styles (Tailwind v4)
 │   ├── layout.tsx        # Root layout
@@ -80,8 +97,8 @@ The project uses a centralized theme configuration in `app/globals.css`. You can
 
 ```css
 @theme {
-    --color-primary: oklch(0.5 0.2 260);
-    --color-background: var(--background);
+  --color-primary: oklch(0.5 0.2 260);
+  --color-background: var(--background);
 }
 ```
 
