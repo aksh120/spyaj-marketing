@@ -2,15 +2,18 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+    return twMerge(clsx(inputs));
 }
 
-export function slugify(str: string) {
-  return str
-    .toLowerCase()
-    .replace(/&/g, " and ")
-    .replace(/[^\w\s-]/g, "") // remove non-word chars
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
+export function slugify(str: string | null | undefined) {
+    if (!str) return "";
+    return str
+        .toString()
+        .toLowerCase()
+        .replace(/&/g, " and ")
+        .replace(/_/g, "-")
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
 }
