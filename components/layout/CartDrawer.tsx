@@ -28,7 +28,6 @@ export default function CartDrawer() {
         clearCart,
     } = useCart();
 
-    // Get related products based on cart items' categories
     const cartCategories = [...new Set(items.map((item) => item.category))];
     const relatedProducts = products
         .filter(
@@ -40,7 +39,6 @@ export default function CartDrawer() {
 
     return (
         <>
-            {/* Backdrop */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
@@ -53,7 +51,6 @@ export default function CartDrawer() {
                 )}
             </AnimatePresence>
 
-            {/* Drawer */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
@@ -63,7 +60,6 @@ export default function CartDrawer() {
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
                         className="fixed top-0 right-0 h-full w-full max-w-md bg-background border-l border-border shadow-2xl z-[70] flex flex-col"
                     >
-                        {/* Header */}
                         <div className="flex items-center justify-between p-4 border-b border-border bg-card">
                             <div className="flex items-center gap-3">
                                 <ShoppingCart className="w-6 h-6 text-primary" />
@@ -82,7 +78,6 @@ export default function CartDrawer() {
                             </button>
                         </div>
 
-                        {/* Cart Items */}
                         <div className="flex-1 overflow-y-auto p-4 space-y-4">
                             {items.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center h-full text-center py-12">
@@ -167,7 +162,6 @@ export default function CartDrawer() {
                                         </motion.div>
                                     ))}
 
-                                    {/* Clear Cart Button */}
                                     {items.length > 0 && (
                                         <button
                                             onClick={clearCart}
@@ -178,7 +172,6 @@ export default function CartDrawer() {
                                         </button>
                                     )}
 
-                                    {/* Related Products */}
                                     {relatedProducts.length > 0 && (
                                         <div className="border-t border-border pt-4 mt-6">
                                             <h3 className="font-bold text-sm mb-3">
@@ -215,13 +208,12 @@ export default function CartDrawer() {
                             )}
                         </div>
 
-                        {/* Footer with Total */}
                         {items.length > 0 && (
                             <div className="border-t border-border p-4 bg-card space-y-4">
                                 <div className="flex items-center justify-between">
                                     <span className="text-muted-foreground">Subtotal</span>
                                     <span className="text-2xl font-black text-primary">
-                                        ₹{totalPrice.toLocaleString()}
+                                        ₹{totalPrice.toLocaleString("en-IN")}
                                     </span>
                                 </div>
                                 <p className="text-xs text-muted-foreground">

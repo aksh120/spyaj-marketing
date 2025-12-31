@@ -39,6 +39,7 @@ import { useState, useEffect, useRef } from "react";
 import { slugify } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { discountProducts, flashDeals, featuredProducts } from "@/lib/data";
+import RecentlyViewed from "@/components/product/RecentlyViewed";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -438,6 +439,8 @@ export default function Home() {
             </motion.div>
           ))}
         </motion.div>
+
+        <RecentlyViewed />
 
         <AnimatedSection className="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-950/20 dark:to-orange-900/20 border-2 border-orange-200 dark:border-orange-800 rounded-xl md:rounded-2xl p-4 md:p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-0 mb-4 md:mb-6">

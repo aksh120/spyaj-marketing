@@ -35,6 +35,7 @@ export const products = [
     orders: 1200,
     badge: "Top Rated",
   },
+
   {
     id: 4,
     name: "Solar Panel Monocrystalline",

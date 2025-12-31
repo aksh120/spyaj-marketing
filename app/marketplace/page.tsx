@@ -52,6 +52,7 @@ const sortOptions = [
 function MarketplaceContent() {
   const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const categorySlug = searchParams.get("category");
@@ -59,8 +60,12 @@ function MarketplaceContent() {
       const foundCategory = categories.find((c) => slugify(c) === categorySlug);
       if (foundCategory) setSelectedCategory(foundCategory);
     }
+
+    const searchParam = searchParams.get("search");
+    if (searchParam) {
+      setSearchQuery(searchParam);
+    }
   }, [searchParams]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("recommended");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -131,7 +136,6 @@ function MarketplaceContent() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12 pt-[80px] md:pt-[100px]">
-      {/* Cart Notification Toast */}
       <AnimatePresence>
         {cartNotification && (
           <motion.div
@@ -232,7 +236,6 @@ function MarketplaceContent() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                {/* Categories */}
                 <div>
                   <h4 className="font-bold mb-3 text-sm flex items-center gap-2">
                     <Grid className="w-4 h-4 text-primary" /> Categories
@@ -256,7 +259,6 @@ function MarketplaceContent() {
                   </div>
                 </div>
 
-                {/* Price Range */}
                 <div>
                   <h4 className="font-bold mb-3 text-sm flex items-center gap-2">
                     <SlidersHorizontal className="w-4 h-4 text-primary" /> Price Range
@@ -272,7 +274,7 @@ function MarketplaceContent() {
                     />
                     <div className="flex items-center justify-between text-sm font-medium bg-muted/50 p-2 rounded-lg border border-border">
                       <span>₹0</span>
-                      <span>₹{priceRange[1].toLocaleString()}</span>
+                      <span>₹{priceRange[1].toLocaleString("en-IN")}</span>
                     </div>
                   </div>
                 </div>
@@ -345,7 +347,7 @@ function MarketplaceContent() {
               <div className="flex justify-between text-xs text-muted-foreground mt-2">
                 <span>₹0</span>
                 <span className="font-bold text-foreground">
-                  ₹{priceRange[1].toLocaleString()}
+                  ₹{priceRange[1].toLocaleString("en-IN")}
                 </span>
               </div>
             </div>
@@ -604,7 +606,7 @@ function MarketplaceContent() {
 
                     <div className="text-[10px] md:text-xs text-muted-foreground mb-2 md:mb-4">
                       <span className="font-semibold text-foreground">
-                        {product.orders.toLocaleString()}
+                        {product.orders.toLocaleString("en-IN")}
                       </span>{" "}
                       orders
                     </div>

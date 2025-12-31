@@ -6,12 +6,12 @@ import { MessageCircle, X, Send, Bot, Paperclip, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 import { useUI } from "@/context/UIContext";
+import { useTheme } from "next-themes";
 
 export default function GlobalWidgets() {
     const { isOpen: isCartOpen } = useCart();
     const { isMobileMenuOpen } = useUI();
 
-    // Hide widgets when cart or mobile menu is open
     if (isCartOpen || isMobileMenuOpen) return null;
 
     return (
@@ -21,6 +21,7 @@ export default function GlobalWidgets() {
         </div>
     );
 }
+
 
 function ChatWidget() {
     const [isOpen, setIsOpen] = useState(false);
@@ -39,6 +40,12 @@ function ChatWidget() {
         },
     ]);
     const [input, setInput] = useState("");
+    const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const handleSend = () => {
         if (!input.trim()) return;
@@ -57,15 +64,21 @@ function ChatWidget() {
         setInput("");
     };
 
+    const isDark = mounted && resolvedTheme === "dark";
+
     return (
         <>
             <AnimatePresence>
-                {isOpen && (
+                {isOpen && mounted && (
                     <motion.div
                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                        className="bg-card/95 backdrop-blur-md w-[320px] md:w-[380px] h-[500px] rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden mb-2"
+                        style={{
+                            backgroundColor: isDark ? "#18181b" : "#ffffff",
+                            borderColor: isDark ? "#3f3f46" : "#e5e7eb",
+                        }}
+                        className="w-[320px] md:w-[380px] h-[500px] rounded-2xl shadow-2xl border-2 flex flex-col overflow-hidden mb-2"
                     >
                         <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -95,7 +108,10 @@ function ChatWidget() {
                             </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/30 dark:bg-zinc-950/50">
+                        <div
+                            className="flex-1 overflow-y-auto p-4 space-y-4"
+                            style={{ backgroundColor: isDark ? "#09090b" : "#f9fafb" }}
+                        >
                             {messages.map((msg) => (
                                 <div
                                     key={msg.id}
@@ -111,21 +127,43 @@ function ChatWidget() {
                                             "px-4 py-2.5 rounded-2xl text-sm shadow-sm transition-all",
                                             msg.sender === "me"
                                                 ? "bg-primary text-primary-foreground rounded-br-none"
-                                                : "bg-muted text-foreground border border-border/50 rounded-bl-none",
+                                                : "rounded-bl-none",
                                         )}
+                                        style={msg.sender !== "me" ? {
+                                            backgroundColor: isDark ? "#27272a" : "#e5e7eb",
+                                            color: isDark ? "#f4f4f5" : "#111827",
+                                        } : undefined}
                                     >
                                         {msg.text}
                                     </div>
-                                    <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-1.5 px-1 font-medium">
+                                    <span
+                                        className="text-[10px] mt-1.5 px-1 font-medium"
+                                        style={{ color: isDark ? "#a1a1aa" : "#6b7280" }}
+                                    >
                                         {msg.time}
                                     </span>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="p-3 border-t border-border bg-background">
-                            <div className="flex items-center gap-2 bg-muted/50 rounded-xl px-3 py-2 border border-border focus-within:border-primary/50 transition-colors">
-                                <button className="text-muted-foreground hover:text-foreground transition-colors">
+                        <div
+                            className="p-3 border-t"
+                            style={{
+                                backgroundColor: isDark ? "#18181b" : "#ffffff",
+                                borderColor: isDark ? "#3f3f46" : "#e5e7eb",
+                            }}
+                        >
+                            <div
+                                className="flex items-center gap-2 rounded-xl px-3 py-2 border focus-within:border-primary/50 transition-colors"
+                                style={{
+                                    backgroundColor: isDark ? "#27272a" : "#f3f4f6",
+                                    borderColor: isDark ? "#3f3f46" : "#e5e7eb",
+                                }}
+                            >
+                                <button
+                                    className="transition-colors"
+                                    style={{ color: isDark ? "#a1a1aa" : "#6b7280" }}
+                                >
                                     <Paperclip className="w-4 h-4" />
                                 </button>
                                 <input
@@ -134,7 +172,8 @@ function ChatWidget() {
                                     onChange={(e) => setInput(e.target.value)}
                                     onKeyDown={(e) => e.key === "Enter" && handleSend()}
                                     placeholder="Type a message..."
-                                    className="flex-1 bg-transparent border-none outline-none text-sm min-w-0"
+                                    style={{ color: isDark ? "#f4f4f5" : "#111827" }}
+                                    className="flex-1 bg-transparent border-none outline-none text-sm min-w-0 placeholder:text-gray-500"
                                 />
                                 <button
                                     onClick={handleSend}
@@ -172,6 +211,12 @@ function AIAssistant() {
     const [query, setQuery] = useState("");
     const [response, setResponse] = useState<null | string>(null);
     const [isTyping, setIsTyping] = useState(false);
+    const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const handleAsk = () => {
         if (!query.trim()) return;
@@ -185,15 +230,22 @@ function AIAssistant() {
         }, 1500);
     };
 
+    const isDark = mounted && resolvedTheme === "dark";
+
     return (
         <>
             <AnimatePresence>
-                {isOpen && (
+                {isOpen && mounted && (
                     <motion.div
                         initial={{ opacity: 0, x: 20, scale: 0.95 }}
                         animate={{ opacity: 1, x: 0, scale: 1 }}
                         exit={{ opacity: 0, x: 20, scale: 0.95 }}
-                        className="bg-card/95 backdrop-blur-md w-[300px] rounded-2xl shadow-xl border border-border p-4 mb-2 origin-bottom-right"
+                        style={{
+                            backgroundColor: isDark ? "#18181b" : "#ffffff",
+                            borderColor: isDark ? "#3f3f46" : "#e5e7eb",
+                            color: isDark ? "#ffffff" : "#111827",
+                        }}
+                        className="w-[300px] rounded-2xl shadow-2xl border-2 p-4 mb-2 origin-bottom-right"
                     >
                         <div className="flex items-start gap-3 mb-4">
                             <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
@@ -238,7 +290,12 @@ function AIAssistant() {
                                         value={query}
                                         onChange={(e) => setQuery(e.target.value)}
                                         placeholder="E.g., Find verified electronics sellers..."
-                                        className="w-full bg-muted/50 border border-border rounded-xl px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors resize-none h-20"
+                                        style={{
+                                            backgroundColor: isDark ? "#27272a" : "#f3f4f6",
+                                            borderColor: isDark ? "#3f3f46" : "#e5e7eb",
+                                            color: isDark ? "#f4f4f5" : "#111827",
+                                        }}
+                                        className="w-full border rounded-xl px-3 py-2 text-xs placeholder:text-gray-500 focus:outline-none focus:border-primary transition-colors resize-none h-20"
                                     />
                                     <button
                                         onClick={handleAsk}

@@ -343,7 +343,7 @@ export default function ProductDetailsClient({
                                                 { label: "Founded", value: seller.joined },
                                                 { label: "Response Rate", value: seller.responseRate },
                                                 { label: "Employees", value: "51-100" },
-                                                { label: "Total Revenue", value: "US$ 1M - 2.5M" },
+                                                { label: "Total Revenue", value: "₹8,00,00,000 - ₹20,00,00,000" },
                                             ].map((stat, i) => (
                                                 <div
                                                     key={i}
@@ -475,7 +475,7 @@ export default function ProductDetailsClient({
                                             ₹
                                             {(
                                                 parseInt(product.price.replace(/[^0-9]/g, "")) * qty
-                                            ).toLocaleString()}
+                                            ).toLocaleString("en-IN")}
                                         </span>
                                     </div>
                                 </div>

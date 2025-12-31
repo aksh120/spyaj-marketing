@@ -5,12 +5,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Menu, X, MapPin, ChevronDown, ShoppingCart } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { useCart } from "@/context/CartContext";
 import { useUI } from "@/context/UIContext";
+import SearchAutocomplete, { SearchAutocompleteRef } from "@/components/search/SearchAutocomplete";
+import VoiceSearch from "@/components/search/VoiceSearch";
+import { useRouter } from "next/navigation";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -126,6 +129,7 @@ const cities = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const { isMobileMenuOpen, setIsMobileMenuOpen } = useUI();
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
@@ -135,6 +139,18 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [imgError, setImgError] = useState(false);
   const { totalItems, setIsOpen: setCartOpen } = useCart();
+  const searchRef = useRef<SearchAutocompleteRef>(null);
+
+  const handleVoiceSearch = (transcript: string) => {
+    if (searchRef.current) {
+      searchRef.current.setQuery(transcript);
+      searchRef.current.triggerSearch(transcript);
+    }
+  };
+
+  const handleSearch = (query: string) => {
+    router.push(`/marketplace?search=${encodeURIComponent(query)}`);
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -262,15 +278,9 @@ export default function Navbar() {
           )}
         </div>
 
-        <div className="hidden lg:flex flex-1 max-w-xl">
-          <div className="relative w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="What are you looking for today?"
-              className="w-full bg-background border-2 border-border rounded-full py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-            />
-          </div>
+        <div className="hidden lg:flex flex-1 max-w-xl items-center gap-2">
+          <SearchAutocomplete ref={searchRef} onSearch={handleSearch} />
+          <VoiceSearch onResult={handleVoiceSearch} />
         </div>
 
         <div className="hidden md:flex items-center gap-6 mx-5">
@@ -312,7 +322,6 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Cart Button */}
           <button
             onClick={() => setCartOpen(true)}
             className="relative p-2 hover:bg-muted rounded-full transition-colors"
@@ -340,7 +349,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu Backdrop */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -353,7 +361,6 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* Mobile Menu Drawer */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -363,7 +370,6 @@ export default function Navbar() {
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-background z-[60] md:hidden flex flex-col shadow-2xl"
           >
-            {/* Header */}
             <div className="relative bg-gradient-to-br from-primary via-primary to-blue-600 p-6 pb-8">
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -377,9 +383,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Content */}
             <div className="flex-1 overflow-y-auto">
-              {/* Search */}
               <div className="p-4 border-b border-border">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -391,7 +395,6 @@ export default function Navbar() {
                 </div>
               </div>
 
-              {/* City Selector */}
               <div className="p-4 border-b border-border">
                 <div className="flex items-center gap-2 mb-2">
                   <MapPin className="w-4 h-4 text-primary" />
@@ -413,7 +416,6 @@ export default function Navbar() {
                 </div>
               </div>
 
-              {/* Navigation Links */}
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Menu className="w-4 h-4 text-primary" />
@@ -446,7 +448,6 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Footer with Auth Buttons */}
             <div className="p-4 border-t border-border bg-card/50">
               <div className="grid grid-cols-2 gap-3">
                 <Link

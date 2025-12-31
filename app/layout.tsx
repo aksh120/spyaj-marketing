@@ -8,6 +8,7 @@ import GlobalWidgets from "@/components/layout/GlobalWidgets";
 import { CartProvider } from "@/context/CartContext";
 import { UIProvider } from "@/context/UIContext";
 import CartDrawer from "@/components/layout/CartDrawer";
+import InstallPrompt from "@/components/pwa/InstallPrompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,9 @@ export const metadata: Metadata = {
   openGraph: {
     images: ["/logo.png"],
   },
+  manifest: "/manifest.json",
+  themeColor: "#2563eb",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 };
 
 export default function RootLayout({
@@ -58,6 +62,7 @@ export default function RootLayout({
               <Footer />
               <GlobalWidgets />
               <CartDrawer />
+              <InstallPrompt />
             </CartProvider>
           </UIProvider>
         </ThemeProvider>
