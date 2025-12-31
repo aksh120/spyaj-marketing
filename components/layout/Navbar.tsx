@@ -3,12 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
-import { Search, Menu, X, MapPin, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, Menu, X, MapPin, ChevronDown, ShoppingCart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { useCart } from "@/context/CartContext";
+import { useUI } from "@/context/UIContext";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -125,13 +127,14 @@ const cities = [
 export default function Navbar() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isMobileMenuOpen, setIsMobileMenuOpen } = useUI();
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState("All Cities");
   const [citySearchQuery, setCitySearchQuery] = useState("");
   const { theme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const { totalItems, setIsOpen: setCartOpen } = useCart();
 
   useEffect(() => {
     setMounted(true);
@@ -308,6 +311,20 @@ export default function Navbar() {
               Sign Up
             </Link>
           </div>
+
+          {/* Cart Button */}
+          <button
+            onClick={() => setCartOpen(true)}
+            className="relative p-2 hover:bg-muted rounded-full transition-colors"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                {totalItems > 99 ? "99+" : totalItems}
+              </span>
+            )}
+          </button>
+
           <ThemeToggle />
 
           <button
@@ -323,44 +340,134 @@ export default function Navbar() {
         </div>
       </div>
 
-      {isMobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute top-full left-0 right-0 bg-background border-b p-6 md:hidden flex flex-col gap-4 shadow-xl"
-        >
-          <div className="relative w-full mb-2">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full bg-muted/50 border rounded-full py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-            />
-          </div>
-
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              className={cn(
-                "text-lg font-medium py-2",
-                pathname === link.href ? "text-primary" : "text-foreground/70",
-              )}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {link.name}
-            </Link>
-          ))}
-          <div className="h-px bg-border my-2" />
-          <Link
-            href="/auth/sign-in"
-            className="text-lg font-medium py-2"
+      {/* Mobile Menu Backdrop */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={() => setIsMobileMenuOpen(false)}
+            className="fixed inset-0 bg-black/60 z-[55] md:hidden backdrop-blur-sm"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Mobile Menu Drawer */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-background z-[60] md:hidden flex flex-col shadow-2xl"
           >
-            Sign In
-          </Link>
-        </motion.div>
-      )}
+            {/* Header */}
+            <div className="relative bg-gradient-to-br from-primary via-primary to-blue-600 p-6 pb-8">
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+              <div className="mt-4">
+                <h2 className="text-2xl font-black text-white">Menu</h2>
+                <p className="text-white/70 text-sm mt-1">Explore SPYAJ Marketing</p>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto">
+              {/* Search */}
+              <div className="p-4 border-b border-border">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    className="w-full bg-muted/50 border border-border rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none focus:border-primary transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* City Selector */}
+              <div className="p-4 border-b border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Location</span>
+                </div>
+                <div className="relative">
+                  <select
+                    value={selectedCity}
+                    onChange={(e) => setSelectedCity(e.target.value)}
+                    className="w-full bg-card border border-border rounded-xl py-2.5 px-3 appearance-none outline-none focus:border-primary transition-all text-sm font-medium"
+                  >
+                    {cities.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Navigation Links */}
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Menu className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Navigation</span>
+                </div>
+                <div className="space-y-1">
+                  {navLinks.map((link, idx) => (
+                    <motion.div
+                      key={link.name}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                    >
+                      <Link
+                        href={link.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={cn(
+                          "flex items-center justify-between py-3 px-4 rounded-xl transition-all",
+                          pathname === link.href
+                            ? "bg-primary/10 text-primary font-bold"
+                            : "text-foreground hover:bg-muted"
+                        )}
+                      >
+                        <span className="text-base font-semibold">{link.name}</span>
+                        <ChevronDown className="w-4 h-4 -rotate-90" />
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Footer with Auth Buttons */}
+            <div className="p-4 border-t border-border bg-card/50">
+              <div className="grid grid-cols-2 gap-3">
+                <Link
+                  href="/auth/sign-in"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-center font-bold py-3 rounded-xl border-2 border-border hover:bg-muted transition-all text-sm"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/auth/sign-up"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-center font-bold py-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all text-sm"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

@@ -116,7 +116,11 @@ export default function ProductDetailsClient({
                                 <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button
                                         onClick={() => setIsWishlisted(!isWishlisted)}
-                                        className="p-2.5 bg-white dark:bg-black/50 backdrop-blur rounded-full text-foreground hover:text-red-500 transition-colors shadow-sm"
+                                        className={cn(
+                                            "p-2.5 rounded-full backdrop-blur-md transition-all shadow-md",
+                                            "bg-white/90 hover:bg-white text-gray-700 hover:text-red-500 border border-gray-200",
+                                            "dark:bg-black/50 dark:hover:bg-black/70 dark:text-white dark:border-white/10"
+                                        )}
                                     >
                                         <Heart
                                             className={cn(
@@ -125,7 +129,11 @@ export default function ProductDetailsClient({
                                             )}
                                         />
                                     </button>
-                                    <button className="p-2.5 bg-white dark:bg-black/50 backdrop-blur rounded-full text-foreground hover:text-primary transition-colors shadow-sm">
+                                    <button className={cn(
+                                        "p-2.5 rounded-full backdrop-blur-md transition-all shadow-md",
+                                        "bg-white/90 hover:bg-white text-gray-700 hover:text-primary border border-gray-200",
+                                        "dark:bg-black/50 dark:hover:bg-black/70 dark:text-white dark:border-white/10"
+                                    )}>
                                         <Share2 className="w-5 h-5" />
                                     </button>
                                 </div>
@@ -461,9 +469,9 @@ export default function ProductDetailsClient({
                                             +
                                         </button>
                                     </div>
-                                    <div className="text-xs text-muted-foreground">
+                                    <div className="text-base text-muted-foreground ml-2">
                                         Total:{" "}
-                                        <span className="font-bold text-foreground">
+                                        <span className="font-black text-lg text-foreground">
                                             ₹
                                             {(
                                                 parseInt(product.price.replace(/[^0-9]/g, "")) * qty

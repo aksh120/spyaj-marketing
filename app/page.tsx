@@ -449,7 +449,7 @@ export default function Home() {
                 <Flame className="w-6 h-6 md:w-8 md:h-8 text-orange-600" />
               </motion.div>
               <h2 className="text-lg md:text-2xl font-black">Price Drop</h2>
-              <span className="text-xs md:text-sm text-muted-foreground bg-orange-200/50 dark:bg-orange-800/30 px-2 py-0.5 rounded-full">
+              <span className="text-xs md:text-sm font-bold bg-orange-600 text-white dark:bg-orange-100 dark:text-black px-3 py-1 rounded-full shadow-sm">
                 Free Shipping | Save Up to ₹5000!
               </span>
             </div>

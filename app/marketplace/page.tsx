@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import {
   Search,
@@ -24,6 +24,7 @@ import Image from "next/image";
 import { useRef } from "react";
 import Link from "next/link";
 import { products, allCategories as categories } from "@/lib/data";
+import { useCart } from "@/context/CartContext";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -65,8 +66,43 @@ function MarketplaceContent() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
+  const [wishlist, setWishlist] = useState<number[]>([]);
+  const [cartNotification, setCartNotification] = useState<string | null>(null);
+  const router = useRouter();
+  const { addToCart } = useCart();
   const containerRef = useRef(null);
   const isInView = useInView(containerRef, { once: true });
+
+  const toggleWishlist = (productId: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setWishlist((prev) =>
+      prev.includes(productId)
+        ? prev.filter((id) => id !== productId)
+        : [...prev, productId]
+    );
+  };
+
+  const handleQuickView = (product: any, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    router.push(`/product/${slugify(product.seller || "Verified Seller")}/${slugify(product.name)}`);
+  };
+
+  const handleAddToCart = (product: any, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      seller: product.seller || "Verified Seller",
+      category: product.category,
+    });
+    setCartNotification(`${product.name} added to cart!`);
+    setTimeout(() => setCartNotification(null), 3000);
+  };
 
   const filteredProducts = products
     .filter(
@@ -95,6 +131,20 @@ function MarketplaceContent() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-12 pt-[80px] md:pt-[100px]">
+      {/* Cart Notification Toast */}
+      <AnimatePresence>
+        {cartNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: -50, x: 50 }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: -50, x: 50 }}
+            className="fixed top-24 right-6 z-50 bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3"
+          >
+            <CheckCircle2 className="w-5 h-5" />
+            <span className="font-medium">{cartNotification}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -154,46 +204,90 @@ function MarketplaceContent() {
 
       <AnimatePresence>
         {isFilterOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-card border-2 border-border rounded-xl p-4 mb-4 shadow-lg overflow-hidden"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold flex items-center gap-2">
-                <Filter className="w-4 h-4" /> Filters
-              </h3>
-              <motion.button
-                whileHover={{ rotate: 90 }}
-                onClick={() => setIsFilterOpen(false)}
-              >
-                <X className="w-5 h-5" />
-              </motion.button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((cat, idx) => (
-                <motion.button
-                  key={cat}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: idx * 0.05 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-lg text-sm transition-all",
-                    selectedCategory === cat
-                      ? "bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/30"
-                      : "bg-muted hover:bg-muted/80",
-                  )}
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsFilterOpen(false)}
+              className="fixed inset-0 bg-black/50 z-50 md:hidden backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-background border-l border-border shadow-2xl z-50 md:hidden flex flex-col"
+            >
+              <div className="flex items-center justify-between p-4 border-b border-border">
+                <h3 className="font-bold flex items-center gap-2 text-lg">
+                  <Filter className="w-5 h-5 text-primary" /> Filters
+                </h3>
+                <button
+                  onClick={() => setIsFilterOpen(false)}
+                  className="p-2 hover:bg-muted rounded-full transition-colors"
                 >
-                  {cat}
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                {/* Categories */}
+                <div>
+                  <h4 className="font-bold mb-3 text-sm flex items-center gap-2">
+                    <Grid className="w-4 h-4 text-primary" /> Categories
+                  </h4>
+                  <div className="space-y-1">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={cn(
+                          "w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all flex items-center justify-between",
+                          selectedCategory === cat
+                            ? "bg-primary text-primary-foreground font-semibold"
+                            : "hover:bg-muted bg-muted/30"
+                        )}
+                      >
+                        {cat}
+                        {selectedCategory === cat && <CheckCircle2 className="w-4 h-4" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Price Range */}
+                <div>
+                  <h4 className="font-bold mb-3 text-sm flex items-center gap-2">
+                    <SlidersHorizontal className="w-4 h-4 text-primary" /> Price Range
+                  </h4>
+                  <div className="px-1 space-y-4">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100000"
+                      value={priceRange[1]}
+                      onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
+                      className="w-full accent-primary h-2 bg-muted rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="flex items-center justify-between text-sm font-medium bg-muted/50 p-2 rounded-lg border border-border">
+                      <span>₹0</span>
+                      <span>₹{priceRange[1].toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 border-t border-border bg-card">
+                <button
+                  onClick={() => setIsFilterOpen(false)}
+                  className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-bold hover:bg-primary/90 transition-all shadow-lg"
+                >
+                  Show Results
+                </button>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
@@ -372,7 +466,7 @@ function MarketplaceContent() {
                   className={cn(
                     "group bg-background border-2 border-border rounded-xl md:rounded-2xl overflow-hidden transition-all duration-300 relative",
                     hoveredProduct === product.id &&
-                      "border-primary/50 shadow-xl shadow-primary/10",
+                    "border-primary/50 shadow-xl shadow-primary/10",
                   )}
                 >
                   <Link
@@ -405,14 +499,14 @@ function MarketplaceContent() {
                         className={cn(
                           "absolute top-2 md:top-3 left-2 md:left-3 px-2 py-0.5 md:py-1 rounded-md text-[8px] md:text-[10px] font-bold shadow-lg uppercase tracking-wider",
                           product.badge === "Best Seller" &&
-                            "bg-orange-500 text-white",
+                          "bg-orange-500 text-white",
                           product.badge === "Top Rated" &&
-                            "bg-yellow-500 text-black",
+                          "bg-yellow-500 text-black",
                           product.badge === "Trending" &&
-                            "bg-pink-500 text-white",
+                          "bg-pink-500 text-white",
                           product.badge === "New" && "bg-green-500 text-white",
                           product.badge === "Popular" &&
-                            "bg-blue-500 text-white",
+                          "bg-blue-500 text-white",
                         )}
                       >
                         {product.badge}
@@ -434,21 +528,37 @@ function MarketplaceContent() {
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          className="p-2 bg-white rounded-full shadow-lg"
+                          onClick={(e) => handleQuickView(product, e)}
+                          className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+                          title="Quick View"
                         >
                           <Eye className="w-4 h-4 text-gray-700" />
                         </motion.button>
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          className="p-2 bg-white rounded-full shadow-lg"
+                          onClick={(e) => toggleWishlist(product.id, e)}
+                          className={cn(
+                            "p-2 rounded-full shadow-lg transition-colors",
+                            wishlist.includes(product.id)
+                              ? "bg-red-500 hover:bg-red-600"
+                              : "bg-white hover:bg-gray-100"
+                          )}
+                          title={wishlist.includes(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
                         >
-                          <Heart className="w-4 h-4 text-gray-700" />
+                          <Heart className={cn(
+                            "w-4 h-4",
+                            wishlist.includes(product.id)
+                              ? "text-white fill-white"
+                              : "text-gray-700"
+                          )} />
                         </motion.button>
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          className="p-2 bg-primary rounded-full shadow-lg"
+                          onClick={(e) => handleAddToCart(product, e)}
+                          className="p-2 bg-primary rounded-full shadow-lg hover:bg-primary/90 transition-colors"
+                          title="Add to Cart"
                         >
                           <ShoppingCart className="w-4 h-4 text-white" />
                         </motion.button>

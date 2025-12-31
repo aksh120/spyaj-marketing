@@ -5,6 +5,9 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import GlobalWidgets from "@/components/layout/GlobalWidgets";
+import { CartProvider } from "@/context/CartContext";
+import { UIProvider } from "@/context/UIContext";
+import CartDrawer from "@/components/layout/CartDrawer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,10 +51,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
-          <main className="flex-grow">{children}</main>
-          <Footer />
-          <GlobalWidgets />
+          <UIProvider>
+            <CartProvider>
+              <Navbar />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+              <GlobalWidgets />
+              <CartDrawer />
+            </CartProvider>
+          </UIProvider>
         </ThemeProvider>
       </body>
     </html>
