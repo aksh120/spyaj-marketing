@@ -197,9 +197,9 @@ export default function LandingPage2() {
             <VerificationTiersSection />
             <HowItWorksSection />
             <BuyerBenefitsSection />
+            <StatsSection />
             <FeaturedSuppliersSection />
             <RFQSection />
-            <StatsSection />
             <TestimonialsSection />
             <PartnerLogosSection />
             <FAQSection />
@@ -615,13 +615,29 @@ function DeprecatedHeroSection() {
 }
 
 function TrustBar() {
+    const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const isDark = mounted && resolvedTheme === "dark";
+
     return (
         <motion.section
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-card border-y border-border py-6"
+            className="py-8 relative overflow-hidden"
+            style={{
+                backgroundColor: isDark ? 'rgba(15,23,42,0.8)' : 'rgba(248,250,252,0.9)',
+                borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+            }}
         >
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-50" />
+
             <div className="max-w-[1400px] mx-auto px-4 md:px-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {trustFeatures.map((feature, i) => (
@@ -631,14 +647,28 @@ function TrustBar() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
-                            className="flex items-center gap-3"
+                            whileHover={{ scale: 1.05, y: -4 }}
+                            className="flex items-center gap-4 p-4 rounded-2xl backdrop-blur-sm cursor-pointer transition-all"
+                            style={{
+                                backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.7)',
+                                border: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+                            }}
                         >
-                            <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                                {feature.icon}
-                            </div>
+                            <motion.div
+                                whileHover={{ rotate: 360 }}
+                                transition={{ duration: 0.5 }}
+                                className="p-3 rounded-xl"
+                                style={{
+                                    background: isDark
+                                        ? 'linear-gradient(135deg, rgba(20,184,166,0.2), rgba(16,185,129,0.2))'
+                                        : 'linear-gradient(135deg, rgba(20,184,166,0.1), rgba(16,185,129,0.1))',
+                                }}
+                            >
+                                <span style={{ color: isDark ? '#2dd4bf' : '#0d9488' }}>{feature.icon}</span>
+                            </motion.div>
                             <div>
-                                <p className="font-bold text-sm">{feature.text}</p>
-                                <p className="text-xs text-muted-foreground">{feature.desc}</p>
+                                <p className="font-bold text-sm" style={{ color: isDark ? '#ffffff' : '#111827' }}>{feature.text}</p>
+                                <p className="text-xs" style={{ color: isDark ? 'rgba(255,255,255,0.6)' : '#6b7280' }}>{feature.desc}</p>
                             </div>
                         </motion.div>
                     ))}
@@ -651,19 +681,58 @@ function TrustBar() {
 function IndustriesSection() {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true });
+    const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const isDark = mounted && resolvedTheme === "dark";
 
     return (
-        <section ref={ref} className="py-16 md:py-24 bg-background">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-6">
+        <section
+            ref={ref}
+            className="py-20 md:py-28 relative overflow-hidden"
+            style={{ backgroundColor: isDark ? '#0f172a' : '#ffffff' }}
+        >
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div
+                    className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl"
+                    style={{ backgroundColor: isDark ? 'rgba(20,184,166,0.1)' : 'rgba(20,184,166,0.05)' }}
+                />
+                <div
+                    className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl"
+                    style={{ backgroundColor: isDark ? 'rgba(16,185,129,0.1)' : 'rgba(16,185,129,0.05)' }}
+                />
+            </div>
+
+            <div className="max-w-[1400px] mx-auto px-4 md:px-6 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    className="text-center mb-12"
+                    className="text-center mb-16"
                 >
-                    <h2 className="text-3xl md:text-4xl font-black mb-4">
-                        Explore <span className="text-primary">Industries</span>
+                    <motion.span
+                        className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4"
+                        style={{
+                            backgroundColor: isDark ? 'rgba(20,184,166,0.1)' : 'rgba(20,184,166,0.1)',
+                            color: isDark ? '#2dd4bf' : '#0d9488',
+                            border: `1px solid ${isDark ? 'rgba(20,184,166,0.2)' : 'rgba(20,184,166,0.2)'}`,
+                        }}
+                    >
+                        50+ Industries
+                    </motion.span>
+                    <h2
+                        className="text-4xl md:text-5xl font-black mb-4"
+                        style={{ color: isDark ? '#ffffff' : '#111827' }}
+                    >
+                        Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">Industries</span>
                     </h2>
-                    <p className="text-muted-foreground max-w-2xl mx-auto">
+                    <p
+                        className="max-w-2xl mx-auto text-lg"
+                        style={{ color: isDark ? 'rgba(255,255,255,0.6)' : '#6b7280' }}
+                    >
                         Find verified suppliers across 50+ industries. From raw materials to finished goods.
                     </p>
                 </motion.div>
@@ -672,27 +741,68 @@ function IndustriesSection() {
                     variants={staggerContainer}
                     initial="hidden"
                     animate={isInView ? "visible" : "hidden"}
-                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"
                 >
                     {industries.map((industry, i) => (
-                        <motion.div key={i} variants={staggerItem}>
+                        <motion.div
+                            key={i}
+                            variants={staggerItem}
+                            whileHover={{ y: -8, scale: 1.02 }}
+                            className="group"
+                        >
                             <Link
                                 href={`/marketplace?category=${industry.name.toLowerCase().replace(/\s+/g, "-")}`}
-                                className={cn(
-                                    "block p-5 rounded-2xl border-2 border-border hover:border-primary/50 transition-all group",
-                                    `bg-gradient-to-br ${industry.color}`
-                                )}
+                                className="block relative p-6 rounded-3xl overflow-hidden transition-all duration-300"
+                                style={{
+                                    backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff',
+                                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
+                                    boxShadow: isDark
+                                        ? '0 4px 20px rgba(0,0,0,0.3)'
+                                        : '0 4px 20px rgba(0,0,0,0.05)',
+                                }}
                             >
+                                <div
+                                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"
+                                    style={{
+                                        background: isDark
+                                            ? 'linear-gradient(135deg, rgba(20,184,166,0.1), rgba(16,185,129,0.1))'
+                                            : 'linear-gradient(135deg, rgba(20,184,166,0.05), rgba(16,185,129,0.05))',
+                                    }}
+                                />
+
+                                <div
+                                    className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                    style={{
+                                        border: `1px solid ${isDark ? 'rgba(20,184,166,0.4)' : 'rgba(20,184,166,0.3)'}`,
+                                    }}
+                                />
+
                                 <motion.div
                                     whileHover={{ scale: 1.1, rotate: 5 }}
-                                    className="w-12 h-12 bg-background rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors"
+                                    className="relative w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-all duration-300"
+                                    style={{
+                                        background: isDark
+                                            ? 'linear-gradient(135deg, rgba(20,184,166,0.2), rgba(16,185,129,0.2))'
+                                            : 'linear-gradient(135deg, rgba(20,184,166,0.1), rgba(16,185,129,0.1))',
+                                    }}
                                 >
-                                    <span className="text-primary">{industry.icon}</span>
+                                    <span style={{ color: isDark ? '#2dd4bf' : '#0d9488' }}>{industry.icon}</span>
                                 </motion.div>
-                                <h3 className="font-bold text-sm mb-1 group-hover:text-primary transition-colors">
+                                <h3
+                                    className="relative font-bold text-base mb-2 group-hover:text-teal-500 transition-colors"
+                                    style={{ color: isDark ? '#ffffff' : '#111827' }}
+                                >
                                     {industry.name}
                                 </h3>
-                                <p className="text-xs text-muted-foreground">{industry.suppliers} suppliers</p>
+                                <div className="relative flex items-center gap-2">
+                                    <span
+                                        className="text-sm font-semibold"
+                                        style={{ color: isDark ? '#22c55e' : '#16a34a' }}
+                                    >
+                                        {industry.suppliers}
+                                    </span>
+                                    <span style={{ color: isDark ? 'rgba(255,255,255,0.5)' : '#9ca3af' }} className="text-sm">suppliers</span>
+                                </div>
                             </Link>
                         </motion.div>
                     ))}
@@ -705,45 +815,132 @@ function IndustriesSection() {
 function HowItWorksSection() {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true });
+    const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const isDark = mounted && resolvedTheme === "dark";
 
     return (
-        <section ref={ref} className="py-16 md:py-24 bg-muted/30">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-6">
+        <section
+            ref={ref}
+            className="py-20 md:py-28 relative overflow-hidden"
+            style={{
+                background: isDark
+                    ? 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)'
+                    : 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)'
+            }}
+        >
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <svg className="absolute w-full h-full opacity-[0.03]" style={{ color: isDark ? '#ffffff' : '#000000' }}>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" />
+                    </pattern>
+                    <rect width="100%" height="100%" fill="url(#grid)" />
+                </svg>
+            </div>
+
+            <div className="max-w-[1400px] mx-auto px-4 md:px-6 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    className="text-center mb-12"
+                    className="text-center mb-16"
                 >
-                    <h2 className="text-3xl md:text-4xl font-black mb-4">
-                        How It <span className="text-primary">Works</span>
+                    <motion.span
+                        className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4"
+                        style={{
+                            backgroundColor: isDark ? 'rgba(245,158,11,0.1)' : 'rgba(245,158,11,0.1)',
+                            color: isDark ? '#fbbf24' : '#d97706',
+                            border: `1px solid ${isDark ? 'rgba(245,158,11,0.2)' : 'rgba(245,158,11,0.2)'}`,
+                        }}
+                    >
+                        Simple Process
+                    </motion.span>
+                    <h2
+                        className="text-4xl md:text-5xl font-black mb-4"
+                        style={{ color: isDark ? '#ffffff' : '#111827' }}
+                    >
+                        How It <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">Works</span>
                     </h2>
-                    <p className="text-muted-foreground max-w-2xl mx-auto">
+                    <p
+                        className="max-w-2xl mx-auto text-lg"
+                        style={{ color: isDark ? 'rgba(255,255,255,0.6)' : '#6b7280' }}
+                    >
                         Start sourcing in minutes. Our streamlined process makes B2B trade simple.
                     </p>
                 </motion.div>
 
-                <div className="grid md:grid-cols-4 gap-6 relative">
-                    <div className="hidden md:block absolute top-16 left-[12%] right-[12%] h-0.5 bg-gradient-to-r from-primary/20 via-primary to-primary/20" />
+                <div className="grid md:grid-cols-4 gap-8 relative">
+                    <div className="hidden md:block absolute top-20 left-[15%] right-[15%] h-1 rounded-full overflow-hidden">
+                        <motion.div
+                            initial={{ scaleX: 0 }}
+                            animate={isInView ? { scaleX: 1 } : {}}
+                            transition={{ duration: 1.5, delay: 0.5 }}
+                            className="h-full origin-left"
+                            style={{
+                                background: isDark
+                                    ? 'linear-gradient(90deg, rgba(245,158,11,0.5), rgba(249,115,22,0.5), rgba(245,158,11,0.5))'
+                                    : 'linear-gradient(90deg, rgba(245,158,11,0.3), rgba(249,115,22,0.3), rgba(245,158,11,0.3))',
+                            }}
+                        />
+                    </div>
 
                     {howItWorks.map((step, i) => (
                         <motion.div
                             key={i}
-                            initial={{ opacity: 0, y: 30 }}
+                            initial={{ opacity: 0, y: 40 }}
                             animate={isInView ? { opacity: 1, y: 0 } : {}}
-                            transition={{ delay: i * 0.15 }}
-                            className="relative text-center"
+                            transition={{ delay: i * 0.2 }}
+                            className="relative text-center group"
                         >
-                            <motion.div
-                                whileHover={{ scale: 1.1 }}
-                                className="w-20 h-20 mx-auto mb-6 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg relative z-10"
+                            <motion.span
+                                initial={{ scale: 0 }}
+                                animate={isInView ? { scale: 1 } : {}}
+                                transition={{ delay: i * 0.2 + 0.3, type: "spring" }}
+                                className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 px-3 py-1 rounded-full text-xs font-bold"
+                                style={{
+                                    background: 'linear-gradient(135deg, #f59e0b, #f97316)',
+                                    color: '#ffffff',
+                                    boxShadow: '0 4px 15px rgba(245,158,11,0.4)',
+                                }}
                             >
-                                {step.icon}
-                            </motion.div>
-                            <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 bg-yellow-400 text-black text-xs font-bold px-2 py-0.5 rounded-full">
                                 Step {step.step}
-                            </span>
-                            <h3 className="font-bold text-lg mb-2">{step.title}</h3>
-                            <p className="text-sm text-muted-foreground">{step.desc}</p>
+                            </motion.span>
+
+                            <motion.div
+                                whileHover={{ scale: 1.1, y: -5 }}
+                                className="relative w-24 h-24 mx-auto mb-8 rounded-3xl flex items-center justify-center z-10"
+                                style={{
+                                    background: 'linear-gradient(135deg, #f59e0b, #f97316)',
+                                    boxShadow: isDark
+                                        ? '0 10px 40px rgba(245,158,11,0.3), 0 0 0 1px rgba(255,255,255,0.1) inset'
+                                        : '0 10px 40px rgba(245,158,11,0.2)',
+                                }}
+                            >
+                                <span className="text-white">{step.icon}</span>
+                                <motion.div
+                                    className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                    style={{
+                                        boxShadow: '0 0 30px rgba(245,158,11,0.5)',
+                                    }}
+                                />
+                            </motion.div>
+
+                            <h3
+                                className="font-bold text-xl mb-3"
+                                style={{ color: isDark ? '#ffffff' : '#111827' }}
+                            >
+                                {step.title}
+                            </h3>
+                            <p
+                                className="text-sm leading-relaxed"
+                                style={{ color: isDark ? 'rgba(255,255,255,0.6)' : '#6b7280' }}
+                            >
+                                {step.desc}
+                            </p>
                         </motion.div>
                     ))}
                 </div>
@@ -755,23 +952,69 @@ function HowItWorksSection() {
 function FeaturedSuppliersSection() {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true });
+    const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const isDark = mounted && resolvedTheme === "dark";
 
     return (
-        <section ref={ref} className="py-16 md:py-24 bg-background">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-6">
+        <section
+            ref={ref}
+            className="py-20 md:py-28 relative overflow-hidden"
+            style={{ backgroundColor: isDark ? '#020617' : '#ffffff' }}
+        >
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div
+                    className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-3xl opacity-30"
+                    style={{
+                        background: isDark
+                            ? 'radial-gradient(circle, rgba(100,116,139,0.15), transparent 70%)'
+                            : 'radial-gradient(circle, rgba(100,116,139,0.08), transparent 70%)'
+                    }}
+                />
+            </div>
+
+            <div className="max-w-[1400px] mx-auto px-4 md:px-6 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    className="flex items-center justify-between mb-12"
+                    className="flex flex-col md:flex-row items-start md:items-center justify-between mb-14 gap-4"
                 >
                     <div>
-                        <h2 className="text-3xl md:text-4xl font-black mb-2">
-                            Featured <span className="text-primary">Suppliers</span>
+                        <motion.span
+                            className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4"
+                            style={{
+                                backgroundColor: isDark ? 'rgba(234,179,8,0.1)' : 'rgba(234,179,8,0.1)',
+                                color: isDark ? '#fbbf24' : '#ca8a04',
+                                border: `1px solid ${isDark ? 'rgba(234,179,8,0.2)' : 'rgba(234,179,8,0.2)'}`,
+                            }}
+                        >
+                            ⭐ Top Rated
+                        </motion.span>
+                        <h2
+                            className="text-4xl md:text-5xl font-black mb-3"
+                            style={{ color: isDark ? '#ffffff' : '#111827' }}
+                        >
+                            Featured <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-500 to-zinc-400">Suppliers</span>
                         </h2>
-                        <p className="text-muted-foreground">Top-rated verified suppliers with excellent track records</p>
+                        <p style={{ color: isDark ? 'rgba(255,255,255,0.6)' : '#6b7280' }} className="text-lg">
+                            Top-rated verified suppliers with excellent track records
+                        </p>
                     </div>
-                    <Link href="/seller" className="hidden md:flex items-center gap-2 text-primary font-bold hover:underline">
-                        View All <ChevronRight className="w-4 h-4" />
+                    <Link
+                        href="/seller"
+                        className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all"
+                        style={{
+                            backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f3f4f6',
+                            color: isDark ? '#ffffff' : '#111827',
+                            border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#e5e7eb'}`,
+                        }}
+                    >
+                        View All Suppliers <ChevronRight className="w-4 h-4" />
                     </Link>
                 </motion.div>
 
@@ -785,57 +1028,99 @@ function FeaturedSuppliersSection() {
                         <motion.div
                             key={i}
                             variants={staggerItem}
-                            whileHover={{ y: -8, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
-                            className="bg-card border-2 border-border rounded-2xl p-6 hover:border-primary/50 transition-all"
+                            whileHover={{ y: -10, scale: 1.02 }}
+                            className="relative group rounded-3xl overflow-hidden"
+                            style={{
+                                backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff',
+                                border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
+                                boxShadow: isDark
+                                    ? '0 4px 20px rgba(0,0,0,0.4)'
+                                    : '0 4px 20px rgba(0,0,0,0.06)',
+                            }}
                         >
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center font-bold text-primary">
-                                        {supplier.name.charAt(0)}
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold">{supplier.name}</h3>
-                                        <p className="text-sm text-muted-foreground">{supplier.category}</p>
-                                    </div>
-                                </div>
-                                <span className={cn(
-                                    "text-xs font-bold px-2 py-1 rounded-full",
-                                    supplier.verified === "Gold" ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                                )}>
-                                    {supplier.verified}
-                                </span>
-                            </div>
+                            <div
+                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                style={{
+                                    background: isDark
+                                        ? 'linear-gradient(135deg, rgba(100,116,139,0.05), rgba(71,85,105,0.05))'
+                                        : 'linear-gradient(135deg, rgba(100,116,139,0.02), rgba(71,85,105,0.02))',
+                                }}
+                            />
 
-                            <div className="grid grid-cols-3 gap-4 mb-4">
-                                <div className="text-center p-2 bg-muted/50 rounded-lg">
-                                    <div className="flex items-center justify-center gap-1 mb-1">
-                                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                                        <span className="font-bold text-sm">{supplier.rating}</span>
+                            <div className="relative p-6">
+                                <div className="flex items-start justify-between mb-5">
+                                    <div className="flex items-center gap-4">
+                                        <motion.div
+                                            whileHover={{ rotate: 360 }}
+                                            transition={{ duration: 0.5 }}
+                                            className="w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-lg"
+                                            style={{
+                                                background: 'linear-gradient(135deg, #64748b, #475569)',
+                                                color: '#ffffff',
+                                            }}
+                                        >
+                                            {supplier.name.charAt(0)}
+                                        </motion.div>
+                                        <div>
+                                            <h3 className="font-bold text-lg" style={{ color: isDark ? '#ffffff' : '#111827' }}>
+                                                {supplier.name}
+                                            </h3>
+                                            <p className="text-sm" style={{ color: isDark ? 'rgba(255,255,255,0.5)' : '#6b7280' }}>
+                                                {supplier.category}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <span className="text-[10px] text-muted-foreground">Rating</span>
+                                    <span
+                                        className="px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1"
+                                        style={{
+                                            background: supplier.verified === "Gold"
+                                                ? 'linear-gradient(135deg, #f59e0b, #d97706)'
+                                                : (isDark ? 'rgba(255,255,255,0.1)' : '#f3f4f6'),
+                                            color: supplier.verified === "Gold" ? '#ffffff' : (isDark ? '#ffffff' : '#374151'),
+                                        }}
+                                    >
+                                        {supplier.verified === "Gold" && "✓ "}{supplier.verified}
+                                    </span>
                                 </div>
-                                <div className="text-center p-2 bg-muted/50 rounded-lg">
-                                    <div className="flex items-center justify-center gap-1 mb-1">
-                                        <Clock className="w-3 h-3 text-primary" />
-                                        <span className="font-bold text-sm">{supplier.responseTime}</span>
-                                    </div>
-                                    <span className="text-[10px] text-muted-foreground">Response</span>
-                                </div>
-                                <div className="text-center p-2 bg-muted/50 rounded-lg">
-                                    <div className="flex items-center justify-center gap-1 mb-1">
-                                        <Package className="w-3 h-3 text-green-500" />
-                                        <span className="font-bold text-sm">{supplier.orders}</span>
-                                    </div>
-                                    <span className="text-[10px] text-muted-foreground">Orders</span>
-                                </div>
-                            </div>
 
-                            <Link
-                                href="/seller"
-                                className="block text-center py-2 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-colors"
-                            >
-                                View Profile
-                            </Link>
+                                <div className="grid grid-cols-3 gap-3 mb-5">
+                                    {[
+                                        { icon: <Star className="w-4 h-4" />, value: supplier.rating, label: "Rating", color: "#eab308" },
+                                        { icon: <Clock className="w-4 h-4" />, value: supplier.responseTime, label: "Response", color: "#64748b" },
+                                        { icon: <Package className="w-4 h-4" />, value: supplier.orders, label: "Orders", color: "#22c55e" },
+                                    ].map((stat, j) => (
+                                        <div
+                                            key={j}
+                                            className="text-center p-3 rounded-2xl"
+                                            style={{
+                                                backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#f8fafc',
+                                                border: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'}`,
+                                            }}
+                                        >
+                                            <div className="flex items-center justify-center gap-1.5 mb-1">
+                                                <span style={{ color: stat.color }}>{stat.icon}</span>
+                                                <span className="font-bold text-sm" style={{ color: isDark ? '#ffffff' : '#111827' }}>
+                                                    {stat.value}
+                                                </span>
+                                            </div>
+                                            <span className="text-[10px]" style={{ color: isDark ? 'rgba(255,255,255,0.4)' : '#9ca3af' }}>
+                                                {stat.label}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <Link
+                                    href="/seller"
+                                    className="block text-center py-3 rounded-xl font-bold transition-all group-hover:shadow-lg"
+                                    style={{
+                                        background: 'linear-gradient(135deg, #334155, #1e293b)',
+                                        color: '#ffffff',
+                                    }}
+                                >
+                                    View Profile →
+                                </Link>
+                            </div>
                         </motion.div>
                     ))}
                 </motion.div>
@@ -979,21 +1264,89 @@ function RFQSection() {
 function StatsSection() {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, margin: "-100px" });
+    const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const isDark = mounted && resolvedTheme === "dark";
 
     return (
-        <section ref={ref} className="py-16 md:py-24 bg-background">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-6">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <section
+            ref={ref}
+            className="py-20 md:py-28 relative overflow-hidden"
+            style={{
+                backgroundColor: isDark ? '#111827' : '#ffffff',
+                color: isDark ? '#ffffff' : '#111827'
+            }}
+        >
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {[...Array(6)].map((_, i) => (
+                    <motion.div
+                        key={i}
+                        animate={{
+                            y: [-20, 20],
+                            x: [-10, 10],
+                            opacity: [0.3, 0.6, 0.3],
+                        }}
+                        transition={{
+                            duration: 4 + i,
+                            repeat: Infinity,
+                            repeatType: "reverse",
+                            delay: i * 0.5,
+                        }}
+                        className="absolute w-32 h-32 rounded-full blur-3xl"
+                        style={{
+                            backgroundColor: 'rgba(255,255,255,0.1)',
+                            top: `${20 + i * 15}%`,
+                            left: `${10 + i * 15}%`,
+                        }}
+                    />
+                ))}
+            </div>
+
+            <div className="max-w-[1400px] mx-auto px-4 md:px-6 relative z-10">
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    className="text-center mb-14"
+                >
+                    <h2
+                        className="text-4xl md:text-5xl font-black mb-4"
+                        style={{ color: isDark ? '#ffffff' : '#111827' }}
+                    >
+                        Trusted by <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">Thousands</span>
+                    </h2>
+                    <p
+                        className="text-lg max-w-2xl mx-auto"
+                        style={{ color: isDark ? 'rgba(255,255,255,0.7)' : '#6b7280' }}
+                    >
+                        Join the fastest-growing B2B marketplace in India
+                    </p>
+                </motion.div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {stats.map((stat, i) => (
                         <motion.div
                             key={i}
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={isInView ? { opacity: 1, y: 0 } : {}}
-                            transition={{ delay: i * 0.1 }}
-                            className="text-center"
+                            initial={{ opacity: 0, y: 40, scale: 0.9 }}
+                            animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+                            transition={{ delay: i * 0.15, type: "spring" }}
+                            whileHover={{ y: -8, scale: 1.05 }}
+                            className="text-center p-6 rounded-3xl backdrop-blur-md"
+                            style={{
+                                backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f8fafc',
+                                border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'}`,
+                                boxShadow: isDark ? 'none' : '0 4px 20px rgba(0,0,0,0.05)',
+                            }}
                         >
-                            <AnimatedCounter value={stat.value} suffix={stat.suffix} isInView={isInView} />
-                            <p className="text-muted-foreground font-medium">{stat.label}</p>
+                            <AnimatedCounter value={stat.value} suffix={stat.suffix} isInView={isInView} isDark={isDark} />
+                            <p
+                                className="font-medium text-sm mt-2"
+                                style={{ color: isDark ? 'rgba(255,255,255,0.7)' : '#6b7280' }}
+                            >{stat.label}</p>
                         </motion.div>
                     ))}
                 </div>
@@ -1002,7 +1355,7 @@ function StatsSection() {
     );
 }
 
-function AnimatedCounter({ value, suffix, isInView }: { value: number; suffix: string; isInView: boolean }) {
+function AnimatedCounter({ value, suffix, isInView, isDark }: { value: number; suffix: string; isInView: boolean; isDark: boolean }) {
     const [count, setCount] = useState(0);
 
     useEffect(() => {
@@ -1033,7 +1386,10 @@ function AnimatedCounter({ value, suffix, isInView }: { value: number; suffix: s
     };
 
     return (
-        <p className="text-4xl md:text-5xl font-black text-primary mb-2">
+        <p
+            className="text-4xl md:text-5xl font-black mb-2"
+            style={{ color: isDark ? '#ffffff' : '#111827' }}
+        >
             {value >= 1000 ? formatNumber(count) : count}{suffix}
         </p>
     );
@@ -1041,6 +1397,12 @@ function AnimatedCounter({ value, suffix, isInView }: { value: number; suffix: s
 
 function TestimonialsSection() {
     const [activeIndex, setActiveIndex] = useState(0);
+    const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -1049,19 +1411,51 @@ function TestimonialsSection() {
         return () => clearInterval(timer);
     }, []);
 
+    const isDark = mounted && resolvedTheme === "dark";
+
     return (
-        <section className="py-16 md:py-24 bg-muted/30">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-6">
+        <section
+            className="py-20 md:py-28 relative overflow-hidden"
+            style={{
+                background: isDark
+                    ? 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)'
+                    : 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)'
+            }}
+        >
+            <div className="absolute top-20 left-10 text-9xl font-serif opacity-5" style={{ color: isDark ? '#ffffff' : '#000000' }}>
+                "
+            </div>
+            <div className="absolute bottom-20 right-10 text-9xl font-serif opacity-5 rotate-180" style={{ color: isDark ? '#ffffff' : '#000000' }}>
+                "
+            </div>
+
+            <div className="max-w-[1400px] mx-auto px-4 md:px-6 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="text-center mb-12"
+                    className="text-center mb-14"
                 >
-                    <h2 className="text-3xl md:text-4xl font-black mb-4">
-                        Trusted by <span className="text-primary">50,000+ Businesses</span>
+                    <motion.span
+                        className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4"
+                        style={{
+                            backgroundColor: isDark ? 'rgba(236,72,153,0.1)' : 'rgba(236,72,153,0.1)',
+                            color: isDark ? '#f472b6' : '#db2777',
+                            border: `1px solid ${isDark ? 'rgba(236,72,153,0.2)' : 'rgba(236,72,153,0.2)'}`,
+                        }}
+                    >
+                        ❤️ Customer Love
+                    </motion.span>
+                    <h2
+                        className="text-4xl md:text-5xl font-black mb-4"
+                        style={{ color: isDark ? '#ffffff' : '#111827' }}
+                    >
+                        Trusted by <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500">50,000+ Businesses</span>
                     </h2>
-                    <p className="text-muted-foreground max-w-2xl mx-auto">
+                    <p
+                        className="max-w-2xl mx-auto text-lg"
+                        style={{ color: isDark ? 'rgba(255,255,255,0.6)' : '#6b7280' }}
+                    >
                         See what our customers say about their experience with SPYAJ
                     </p>
                 </motion.div>
@@ -1070,46 +1464,99 @@ function TestimonialsSection() {
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={activeIndex}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="bg-card border-2 border-border rounded-2xl p-8 md:p-12 text-center"
+                            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                            className="relative p-10 md:p-14 rounded-3xl text-center"
+                            style={{
+                                backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff',
+                                border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
+                                boxShadow: isDark
+                                    ? '0 20px 60px rgba(0,0,0,0.4)'
+                                    : '0 20px 60px rgba(0,0,0,0.08)',
+                            }}
                         >
-                            <Quote className="w-12 h-12 text-primary/20 mx-auto mb-6" />
-                            <p className="text-lg md:text-xl mb-8 leading-relaxed">
+                            <motion.div
+                                animate={{ rotate: [0, 5, -5, 0] }}
+                                transition={{ duration: 4, repeat: Infinity }}
+                                className="w-16 h-16 mx-auto mb-8 rounded-2xl flex items-center justify-center"
+                                style={{
+                                    background: 'linear-gradient(135deg, #ec4899, #f43f5e)',
+                                }}
+                            >
+                                <Quote className="w-8 h-8 text-white" />
+                            </motion.div>
+
+                            <p
+                                className="text-xl md:text-2xl mb-10 leading-relaxed font-medium"
+                                style={{ color: isDark ? '#ffffff' : '#111827' }}
+                            >
                                 "{testimonials[activeIndex].quote}"
                             </p>
-                            <div className="flex items-center justify-center gap-4 mb-4">
-                                <Image
-                                    src={testimonials[activeIndex].image}
-                                    alt={testimonials[activeIndex].name}
-                                    width={60}
-                                    height={60}
-                                    className="rounded-full"
-                                />
+
+                            <div className="flex items-center justify-center gap-4 mb-6">
+                                <div
+                                    className="w-16 h-16 rounded-2xl overflow-hidden"
+                                    style={{
+                                        border: `2px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'}`,
+                                    }}
+                                >
+                                    <Image
+                                        src={testimonials[activeIndex].image}
+                                        alt={testimonials[activeIndex].name}
+                                        width={64}
+                                        height={64}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
                                 <div className="text-left">
-                                    <p className="font-bold">{testimonials[activeIndex].name}</p>
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="font-bold text-lg" style={{ color: isDark ? '#ffffff' : '#111827' }}>
+                                        {testimonials[activeIndex].name}
+                                    </p>
+                                    <p className="text-sm" style={{ color: isDark ? 'rgba(255,255,255,0.6)' : '#6b7280' }}>
                                         {testimonials[activeIndex].role}, {testimonials[activeIndex].company}
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
-                                <span className="bg-muted px-3 py-1 rounded-full">{testimonials[activeIndex].industry}</span>
-                                <span className="bg-muted px-3 py-1 rounded-full">{testimonials[activeIndex].orderVolume}</span>
+
+                            <div className="flex items-center justify-center gap-3">
+                                <span
+                                    className="px-4 py-2 rounded-xl text-sm font-medium"
+                                    style={{
+                                        backgroundColor: isDark ? 'rgba(59,130,246,0.1)' : 'rgba(59,130,246,0.1)',
+                                        color: isDark ? '#60a5fa' : '#2563eb',
+                                    }}
+                                >
+                                    {testimonials[activeIndex].industry}
+                                </span>
+                                <span
+                                    className="px-4 py-2 rounded-xl text-sm font-medium"
+                                    style={{
+                                        backgroundColor: isDark ? 'rgba(34,197,94,0.1)' : 'rgba(34,197,94,0.1)',
+                                        color: isDark ? '#4ade80' : '#16a34a',
+                                    }}
+                                >
+                                    {testimonials[activeIndex].orderVolume}
+                                </span>
                             </div>
                         </motion.div>
                     </AnimatePresence>
 
-                    <div className="flex justify-center gap-2 mt-6">
+                    <div className="flex justify-center gap-3 mt-8">
                         {testimonials.map((_, i) => (
-                            <button
+                            <motion.button
                                 key={i}
+                                whileHover={{ scale: 1.2 }}
+                                whileTap={{ scale: 0.9 }}
                                 onClick={() => setActiveIndex(i)}
-                                className={cn(
-                                    "w-3 h-3 rounded-full transition-all",
-                                    i === activeIndex ? "bg-primary w-8" : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
-                                )}
+                                className="transition-all rounded-full"
+                                style={{
+                                    width: i === activeIndex ? 32 : 12,
+                                    height: 12,
+                                    backgroundColor: i === activeIndex
+                                        ? (isDark ? '#f472b6' : '#ec4899')
+                                        : (isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'),
+                                }}
                             />
                         ))}
                     </div>
@@ -1121,20 +1568,44 @@ function TestimonialsSection() {
 
 function FAQSection() {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
+    const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const isDark = mounted && resolvedTheme === "dark";
 
     return (
-        <section className="py-16 md:py-24 bg-background">
-            <div className="max-w-[1000px] mx-auto px-4 md:px-6">
+        <section
+            className="py-20 md:py-28 relative overflow-hidden"
+            style={{ backgroundColor: isDark ? '#0f172a' : '#ffffff' }}
+        >
+            <div className="max-w-[900px] mx-auto px-4 md:px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="text-center mb-12"
+                    className="text-center mb-14"
                 >
-                    <h2 className="text-3xl md:text-4xl font-black mb-4">
-                        Frequently Asked <span className="text-primary">Questions</span>
+                    <motion.span
+                        className="inline-block px-4 py-1.5 rounded-full text-sm font-medium mb-4"
+                        style={{
+                            backgroundColor: isDark ? 'rgba(244,63,94,0.1)' : 'rgba(244,63,94,0.1)',
+                            color: isDark ? '#fb7185' : '#e11d48',
+                            border: `1px solid ${isDark ? 'rgba(244,63,94,0.2)' : 'rgba(244,63,94,0.2)'}`,
+                        }}
+                    >
+                        💡 Got Questions?
+                    </motion.span>
+                    <h2
+                        className="text-4xl md:text-5xl font-black mb-4"
+                        style={{ color: isDark ? '#ffffff' : '#111827' }}
+                    >
+                        Frequently Asked <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400">Questions</span>
                     </h2>
-                    <p className="text-muted-foreground">
+                    <p style={{ color: isDark ? 'rgba(255,255,255,0.6)' : '#6b7280' }} className="text-lg">
                         Everything you need to know about B2B trade on SPYAJ
                     </p>
                 </motion.div>
@@ -1147,14 +1618,37 @@ function FAQSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: i * 0.1 }}
-                            className="border-2 border-border rounded-xl overflow-hidden"
+                            className="rounded-2xl overflow-hidden"
+                            style={{
+                                backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#ffffff',
+                                border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
+                                boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.04)',
+                            }}
                         >
                             <button
                                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                                className="w-full flex items-center justify-between p-5 text-left font-bold hover:bg-muted/50 transition-colors"
+                                className="w-full flex items-center justify-between p-6 text-left font-bold transition-all"
+                                style={{
+                                    color: isDark ? '#ffffff' : '#111827',
+                                    backgroundColor: openIndex === i
+                                        ? (isDark ? 'rgba(244,63,94,0.1)' : 'rgba(244,63,94,0.05)')
+                                        : 'transparent'
+                                }}
                             >
-                                {faq.q}
-                                <ChevronDown className={cn("w-5 h-5 transition-transform", openIndex === i && "rotate-180")} />
+                                <span className="pr-4">{faq.q}</span>
+                                <motion.div
+                                    animate={{ rotate: openIndex === i ? 180 : 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                                    style={{
+                                        backgroundColor: isDark ? 'rgba(244,63,94,0.2)' : 'rgba(244,63,94,0.1)',
+                                    }}
+                                >
+                                    <ChevronDown
+                                        className="w-5 h-5"
+                                        style={{ color: isDark ? '#fb7185' : '#e11d48' }}
+                                    />
+                                </motion.div>
                             </button>
                             <AnimatePresence>
                                 {openIndex === i && (
@@ -1162,9 +1656,15 @@ function FAQSection() {
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: "auto", opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.3 }}
                                         className="overflow-hidden"
                                     >
-                                        <p className="px-5 pb-5 text-muted-foreground">{faq.a}</p>
+                                        <p
+                                            className="px-6 pb-6 leading-relaxed"
+                                            style={{ color: isDark ? 'rgba(255,255,255,0.7)' : '#6b7280' }}
+                                        >
+                                            {faq.a}
+                                        </p>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -1178,34 +1678,93 @@ function FAQSection() {
 
 function CTASection() {
     return (
-        <section className="py-16 md:py-24 bg-gradient-to-r from-primary to-blue-700">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-6 text-center">
+        <section
+            className="py-24 md:py-32 relative overflow-hidden"
+            style={{
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
+            }}
+        >
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {[...Array(8)].map((_, i) => (
+                    <motion.div
+                        key={i}
+                        animate={{
+                            y: [-30, 30],
+                            x: [-20, 20],
+                            rotate: [0, 360],
+                        }}
+                        transition={{
+                            duration: 8 + i * 2,
+                            repeat: Infinity,
+                            repeatType: "reverse",
+                            delay: i * 0.5,
+                        }}
+                        className="absolute rounded-full"
+                        style={{
+                            width: 100 + i * 50,
+                            height: 100 + i * 50,
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            top: `${10 + i * 10}%`,
+                            left: `${5 + i * 12}%`,
+                        }}
+                    />
+                ))}
+            </div>
+
+            <div className="max-w-[1400px] mx-auto px-4 md:px-6 text-center relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-6">
-                        Ready to Transform Your Business?
+                    <motion.span
+                        className="inline-block px-5 py-2 rounded-full text-sm font-medium mb-6"
+                        style={{
+                            backgroundColor: 'rgba(255,255,255,0.1)',
+                            color: '#ffffff',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                        }}
+                    >
+                        🚀 Start Your Journey Today
+                    </motion.span>
+
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
+                        Ready to Transform<br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 animate-gradient-x">
+                            Your Business?
+                        </span>
                     </h2>
-                    <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
+
+                    <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto">
                         Join 50,000+ businesses already sourcing smarter with SPYAJ.
                         Start with a free account today.
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+
+                    <div className="flex flex-col sm:flex-row gap-5 justify-center">
+                        <motion.div whileHover={{ scale: 1.05, y: -3 }} whileTap={{ scale: 0.95 }}>
                             <Link
                                 href="/marketplace"
-                                className="inline-flex items-center justify-center gap-2 bg-white text-primary font-bold px-8 py-4 rounded-xl shadow-xl hover:bg-gray-100 transition-colors"
+                                className="inline-flex items-center justify-center gap-3 font-bold px-10 py-5 rounded-2xl shadow-2xl transition-all"
+                                style={{
+                                    background: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%)',
+                                    color: '#0f172a',
+                                    boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                                }}
                             >
                                 Start Sourcing Free
                                 <ArrowRight className="w-5 h-5" />
                             </Link>
                         </motion.div>
-                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                        <motion.div whileHover={{ scale: 1.05, y: -3 }} whileTap={{ scale: 0.95 }}>
                             <Link
                                 href="/contact"
-                                className="inline-flex items-center justify-center gap-2 bg-transparent text-white font-bold px-8 py-4 rounded-xl border-2 border-white/30 hover:bg-white/10 transition-colors"
+                                className="inline-flex items-center justify-center gap-3 font-bold px-10 py-5 rounded-2xl transition-all"
+                                style={{
+                                    backgroundColor: 'rgba(255,255,255,0.1)',
+                                    color: '#ffffff',
+                                    border: '2px solid rgba(255,255,255,0.3)',
+                                    backdropFilter: 'blur(10px)',
+                                }}
                             >
                                 <Phone className="w-5 h-5" />
                                 Talk to Sales
