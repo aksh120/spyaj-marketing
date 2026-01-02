@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     MessageCircle,
     Send,
-    DollarSign,
+    IndianRupee,
     Check,
     X,
     ChevronDown,
@@ -102,7 +102,7 @@ export default function NegotiationChat({
                     className
                 )}
             >
-                <DollarSign className="w-4 h-4" />
+                <IndianRupee className="w-4 h-4" />
                 Negotiate Price
             </motion.button>
 

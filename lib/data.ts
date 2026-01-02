@@ -282,14 +282,14 @@ export const featuredProducts = [
   },
   {
     id: 302,
-    name: "Organic Cotton Fabric Roll",
+    name: "Organic Steel Roll",
     price: "₹2,500/meter",
     category: "Textiles",
     seller: "Gujarat Textiles",
     verified: true,
     rating: 4.7,
     orders: 890,
-    image: "https://loremflickr.com/500/500/fabric",
+    image: "https://loremflickr.com/500/500/steel",
   },
   {
     id: 303,

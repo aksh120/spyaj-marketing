@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import {
     Eye,
     MessageCircle,
-    DollarSign,
+    IndianRupee,
     Package,
     TrendingUp,
     Star,
@@ -56,7 +56,7 @@ export default function SellerDashboard() {
                     title="Revenue"
                     value="₹8.5L"
                     change={15}
-                    icon={<DollarSign className="w-5 h-5" />}
+                    icon={<IndianRupee className="w-5 h-5" />}
                 />
                 <StatsCard
                     title="Conversion Rate"

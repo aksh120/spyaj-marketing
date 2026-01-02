@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "loremflickr.com" },
       { protocol: "https", hostname: "placehold.co" },
       { protocol: "https", hostname: "ui-avatars.com" },
+      { protocol: "https", hostname: "randomuser.me" },
     ],
   },
 };

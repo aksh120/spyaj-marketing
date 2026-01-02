@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { UploadCloud, DollarSign, Send, CheckCircle2 } from "lucide-react";
+import { UploadCloud, IndianRupee, Send, CheckCircle2 } from "lucide-react";
 
 export default function RFQPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -95,7 +95,7 @@ export default function RFQPage() {
                       Target Budget (Optional)
                     </label>
                     <div className="relative">
-                      <DollarSign className="absolute left-3 top-3.5 w-4 h-4 text-muted-foreground" />
+                      <IndianRupee className="absolute left-3 top-3.5 w-4 h-4 text-muted-foreground" />
                       <input
                         type="text"
                         placeholder="Enter Amount"
