@@ -12,8 +12,11 @@ import {
   Loader2,
   ArrowRight,
   Sparkles,
+  AlertCircle,
 } from "lucide-react";
 import { useState } from "react";
+import { useFormValidation, useClientRateLimit } from "@/hooks/useSecurity";
+import { RateLimitPresets } from "@/lib/security";
 
 const contactMethods = [
   {
@@ -62,32 +65,58 @@ const faqs = [
 ];
 
 export default function Contact() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "General Inquiry",
-    message: "",
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+
+  // Security: Client-side rate limiting for form submissions
+  // Allows 10 submissions per minute to prevent spam
+  const rateLimit = useClientRateLimit({
+    key: "contact-form",
+    config: RateLimitPresets.form,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({
-        name: "",
-        email: "",
-        subject: "General Inquiry",
-        message: "",
-      });
-    }, 3000);
-  };
+  // Security: Form validation with sanitization
+  // All inputs are validated against predefined schemas and sanitized
+  const form = useFormValidation({
+    initialValues: {
+      name: "",
+      email: "",
+      subject: "General Inquiry",
+      message: "",
+    },
+    schemaMap: {
+      name: "name",
+      email: "email",
+      subject: "subject",
+      message: "message",
+    },
+    validateOnBlur: true,
+    onSubmit: async (sanitizedData) => {
+      // Security: Check rate limit before submission
+      if (!rateLimit.checkAndConsume()) {
+        setRateLimitError(
+          `Too many submissions. Please try again in ${rateLimit.timeUntilReset}.`
+        );
+        return;
+      }
+      setRateLimitError(null);
+
+      // Simulate API call (in production, this would send sanitized data to backend)
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Log sanitized data in development
+      if (process.env.NODE_ENV === "development") {
+        console.log("Sanitized form data:", sanitizedData);
+      }
+
+      setIsSubmitted(true);
+      setTimeout(() => {
+        setIsSubmitted(false);
+        form.reset();
+      }, 3000);
+    },
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-20 pt-[80px] md:pt-[120px]">
@@ -276,7 +305,7 @@ export default function Contact() {
             ) : (
               <motion.form
                 key="form"
-                onSubmit={handleSubmit}
+                onSubmit={form.handleSubmit}
                 className="space-y-4 md:space-y-6"
               >
                 <div className="text-center mb-6">
@@ -287,6 +316,18 @@ export default function Contact() {
                     We'd love to hear from you
                   </p>
                 </div>
+
+                {/* Security: Rate limit error display */}
+                {rateLimitError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm"
+                  >
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    {rateLimitError}
+                  </motion.div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <motion.div
@@ -300,14 +341,22 @@ export default function Contact() {
                     </label>
                     <input
                       type="text"
+                      name="name"
                       placeholder="John Doe"
                       required
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      className="w-full bg-background border-2 border-border px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      maxLength={100}
+                      value={form.values.name}
+                      onChange={form.handleChange}
+                      onBlur={form.handleBlur}
+                      className={`w-full bg-background border-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${form.errors.name ? "border-red-500" : "border-border"
+                        }`}
                     />
+                    {/* Security: Field validation error display */}
+                    {form.errors.name && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {form.errors.name[0]}
+                      </p>
+                    )}
                   </motion.div>
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
@@ -320,14 +369,21 @@ export default function Contact() {
                     </label>
                     <input
                       type="email"
+                      name="email"
                       placeholder="john@company.com"
                       required
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      className="w-full bg-background border-2 border-border px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      maxLength={254}
+                      value={form.values.email}
+                      onChange={form.handleChange}
+                      onBlur={form.handleBlur}
+                      className={`w-full bg-background border-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${form.errors.email ? "border-red-500" : "border-border"
+                        }`}
                     />
+                    {form.errors.email && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {form.errors.email[0]}
+                      </p>
+                    )}
                   </motion.div>
                 </div>
 
@@ -341,10 +397,9 @@ export default function Contact() {
                     Subject
                   </label>
                   <select
-                    value={formData.subject}
-                    onChange={(e) =>
-                      setFormData({ ...formData, subject: e.target.value })
-                    }
+                    name="subject"
+                    value={form.values.subject}
+                    onChange={form.handleChange}
                     className="w-full bg-background border-2 border-border px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
                   >
                     <option>General Inquiry</option>
@@ -365,15 +420,26 @@ export default function Contact() {
                     Message
                   </label>
                   <textarea
+                    name="message"
                     rows={4}
                     placeholder="How can we help your business today?"
                     required
-                    value={formData.message}
-                    onChange={(e) =>
-                      setFormData({ ...formData, message: e.target.value })
-                    }
-                    className="w-full bg-background border-2 border-border px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+                    maxLength={5000}
+                    value={form.values.message}
+                    onChange={form.handleChange}
+                    onBlur={form.handleBlur}
+                    className={`w-full bg-background border-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none ${form.errors.message ? "border-red-500" : "border-border"
+                      }`}
                   ></textarea>
+                  {form.errors.message && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {form.errors.message[0]}
+                    </p>
+                  )}
+                  {/* Security: Character count for message */}
+                  <p className="text-xs text-muted-foreground text-right">
+                    {form.values.message.length}/5000
+                  </p>
                 </motion.div>
 
                 <motion.button
@@ -382,13 +448,18 @@ export default function Contact() {
                     boxShadow: "0 20px 40px rgba(var(--primary)/0.3)",
                   }}
                   whileTap={{ scale: 0.98 }}
-                  disabled={isSubmitting}
+                  disabled={form.isSubmitting || form.hasErrors || rateLimit.isLimited}
                   className="w-full bg-primary text-primary-foreground py-3 md:py-4 rounded-lg md:rounded-xl text-sm md:text-base font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary/20"
                 >
-                  {isSubmitting ? (
+                  {form.isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
                       Sending...
+                    </>
+                  ) : rateLimit.isLimited ? (
+                    <>
+                      <AlertCircle className="w-4 h-4" />
+                      Rate Limited
                     </>
                   ) : (
                     <>
