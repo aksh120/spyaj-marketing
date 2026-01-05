@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Mail, Lock, Loader2, AlertCircle, Shield } from "lucide-react";
 
-export default function AdminLogin() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/admin";
@@ -44,7 +44,6 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
-      {}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyem0wLTRWMjhoLTEydjJoMTJ6bS0xMi04aDEydi0ySDI0djJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
 
       <motion.div
@@ -53,7 +52,6 @@ export default function AdminLogin() {
         transition={{ duration: 0.5 }}
         className="relative w-full max-w-md"
       >
-        {}
         <div className="text-center mb-8">
           <motion.div
             initial={{ scale: 0 }}
@@ -67,9 +65,7 @@ export default function AdminLogin() {
           <p className="text-slate-400">Sign in to manage SPYAJ Marketing</p>
         </div>
 
-        {}
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/10 p-8 shadow-2xl">
-          {}
           {loginError && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -82,7 +78,6 @@ export default function AdminLogin() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Email Address
@@ -103,7 +98,6 @@ export default function AdminLogin() {
               </div>
             </div>
 
-            {}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Password
@@ -124,7 +118,6 @@ export default function AdminLogin() {
               </div>
             </div>
 
-            {}
             <motion.button
               type="submit"
               disabled={isLoading}
@@ -144,11 +137,22 @@ export default function AdminLogin() {
           </form>
         </div>
 
-        {}
         <p className="text-center text-slate-500 text-sm mt-6">
           Protected area. Authorized personnel only.
         </p>
       </motion.div>
     </div>
+  );
+}
+
+export default function AdminLogin() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
