@@ -2,82 +2,83 @@ import { NextRequest, NextResponse } from "next/server";
 import { createContactSubmission } from "@/lib/db";
 import { sendContactNotification } from "@/lib/email";
 import {
-  validateField,
-  sanitizeInput,
+  parseAndValidateBody,
   checkRateLimit,
   RateLimitPresets,
+  getClientIP,
+  ValidationSchemas,
 } from "@/lib/security";
+
+interface ContactFormData {
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  subject?: string;
+  message: string;
+}
+
+const CONTACT_SCHEMA: Partial<
+  Record<keyof ContactFormData, keyof typeof ValidationSchemas>
+> = {
+  name: "name",
+  email: "email",
+  phone: "phoneIN",
+  company: "companyName",
+  subject: "subject",
+  message: "message",
+};
 
 export async function POST(request: NextRequest) {
   try {
-    const forwardedFor = request.headers.get("x-forwarded-for");
-    const clientIP = forwardedFor
-      ? forwardedFor.split(",")[0].trim()
-      : "unknown";
-
+    const clientIP = getClientIP(request);
     const rateLimitKey = `contact:${clientIP}`;
     const rateLimit = checkRateLimit(rateLimitKey, RateLimitPresets.form);
 
     if (rateLimit.isLimited) {
+      const retryAfter = Math.ceil((rateLimit.resetTime - Date.now()) / 1000);
       return NextResponse.json(
-        { error: "Too many requests. Please try again later." },
+        {
+          error: "Too many requests",
+          message: "Please wait before submitting another form.",
+          retryAfter,
+        },
         {
           status: 429,
           headers: {
-            "Retry-After": Math.ceil(
-              (rateLimit.resetTime - Date.now()) / 1000,
+            "Retry-After": retryAfter.toString(),
+            "X-RateLimit-Limit": RateLimitPresets.form.maxRequests.toString(),
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": Math.ceil(
+              rateLimit.resetTime / 1000,
             ).toString(),
           },
         },
       );
     }
 
-    const body = await request.json();
-    const { name, email, phone, company, subject, message } = body;
+    const validation = await parseAndValidateBody<ContactFormData>(
+      request,
+      CONTACT_SCHEMA,
+      50 * 1024,
+    );
 
-    const errors: Record<string, string> = {};
-
-    const nameResult = validateField(name, "name");
-    if (!nameResult.isValid) {
-      errors.name = nameResult.errors[0];
+    if (!validation.success) {
+      return validation.response;
     }
 
-    const emailResult = validateField(email, "email");
-    if (!emailResult.isValid) {
-      errors.email = emailResult.errors[0];
-    }
-
-    const messageResult = validateField(message, "message");
-    if (!messageResult.isValid) {
-      errors.message = messageResult.errors[0];
-    }
-
-    if (Object.keys(errors).length > 0) {
-      return NextResponse.json(
-        { error: "Validation failed", errors },
-        { status: 400 },
-      );
-    }
-
-    const sanitizedData = {
-      name: sanitizeInput(name),
-      email: sanitizeInput(email),
-      phone: phone ? sanitizeInput(phone) : null,
-      company: company ? sanitizeInput(company) : null,
-      subject: subject ? sanitizeInput(subject) : "General Inquiry",
-      message: sanitizeInput(message),
-    };
+    const { data: sanitizedData, raw: rawData } = validation;
 
     const userAgent = request.headers.get("user-agent") || null;
     const referrer = request.headers.get("referer") || null;
 
     const submission = await createContactSubmission({
-      name: sanitizedData.name,
-      email: sanitizedData.email,
-      phone: sanitizedData.phone,
-      company: sanitizedData.company,
-      subject: sanitizedData.subject,
-      message: sanitizedData.message,
+      name: sanitizedData.name as string,
+      email: sanitizedData.email as string,
+      phone: (sanitizedData.phone as string) || null,
+      company: (sanitizedData.company as string) || null,
+      subject: (sanitizedData.subject as string) || "General Inquiry",
+      message: sanitizedData.message as string,
       ip_address: clientIP,
       user_agent: userAgent,
       referrer: referrer,
@@ -85,12 +86,12 @@ export async function POST(request: NextRequest) {
 
     sendContactNotification(
       {
-        name: sanitizedData.name,
-        email: sanitizedData.email,
-        phone: sanitizedData.phone || undefined,
-        company: sanitizedData.company || undefined,
-        subject: sanitizedData.subject,
-        message: sanitizedData.message,
+        name: sanitizedData.name as string,
+        email: sanitizedData.email as string,
+        phone: sanitizedData.phone as string | undefined,
+        company: sanitizedData.company as string | undefined,
+        subject: (sanitizedData.subject as string) || "General Inquiry",
+        message: sanitizedData.message as string,
       },
       submission.id,
     ).catch((err) => {
@@ -113,5 +114,22 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
+  return NextResponse.json(
+    { error: "Method not allowed" },
+    { status: 405, headers: { Allow: "POST" } },
+  );
+}
+
+export async function PUT() {
+  return NextResponse.json(
+    { error: "Method not allowed" },
+    { status: 405, headers: { Allow: "POST" } },
+  );
+}
+
+export async function DELETE() {
+  return NextResponse.json(
+    { error: "Method not allowed" },
+    { status: 405, headers: { Allow: "POST" } },
+  );
 }

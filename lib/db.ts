@@ -351,7 +351,7 @@ export async function createQuoteRequest(
 }
 
 export async function logAuditAction(log: Omit<AuditLog, "id" | "created_at">) {
-  const { error } = await supabase.from("audit_logs").insert(log);
+  const { error } = await supabaseAdmin.from("audit_logs").insert(log);
 
   if (error) {
     console.error("Error logging audit action:", error);
@@ -359,7 +359,7 @@ export async function logAuditAction(log: Omit<AuditLog, "id" | "created_at">) {
 }
 
 export async function logEmail(log: Omit<EmailLog, "id" | "created_at">) {
-  const { error } = await supabase.from("email_logs").insert(log);
+  const { error } = await supabaseAdmin.from("email_logs").insert(log);
 
   if (error) {
     console.error("Error logging email:", error);

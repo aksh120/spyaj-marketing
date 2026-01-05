@@ -42,7 +42,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const email = credentials.email as string;
         const password = credentials.password as string;
 
-        console.log("[AUTH] Attempting login for:", email);
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          throw new Error("Invalid email format");
+        }
 
         const { data: admin, error } = await supabaseAdmin
           .from("admin_users")
@@ -50,31 +53,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           .eq("email", email)
           .single();
 
-        console.log(
-          "[AUTH] Query result - error:",
-          error?.message,
-          "admin:",
-          admin ? "found" : "not found",
-        );
-
         if (error || !admin) {
-          console.log("[AUTH] User not found or query error");
           throw new Error("Invalid email or password");
         }
 
         if (!admin.is_active) {
-          console.log("[AUTH] Account is disabled");
           throw new Error("Account is disabled");
         }
 
-        console.log("[AUTH] Comparing password...");
-        console.log(
-          "[AUTH] Password hash from DB:",
-          admin.password_hash?.substring(0, 20) + "...",
-        );
-
         const isValid = await bcrypt.compare(password, admin.password_hash);
-        console.log("[AUTH] Password valid:", isValid);
 
         if (!isValid) {
           throw new Error("Invalid email or password");

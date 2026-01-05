@@ -519,21 +519,6 @@ function SidebarContent({
 
       {}
       <div className="p-4 border-t border-slate-700">
-        {!collapsed && (
-          <div className="flex items-center gap-3 mb-4 px-3">
-            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
-              {session.user?.name?.[0] || "A"}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
-                {session.user?.name}
-              </p>
-              <p className="text-xs text-slate-400 truncate">
-                {session.user?.role || "Admin"}
-              </p>
-            </div>
-          </div>
-        )}
         <button
           onClick={onSignOut}
           className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"

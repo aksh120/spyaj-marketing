@@ -1,3 +1,5 @@
+import { NextRequest, NextResponse } from "next/server";
+
 export interface ValidationResult {
   isValid: boolean;
   errors: string[];
@@ -15,6 +17,15 @@ export interface RateLimitConfig {
   message?: string;
 }
 
+export interface ValidationSchema {
+  pattern?: RegExp;
+  maxLength: number;
+  minLength: number;
+  message: string;
+  required?: boolean;
+  allowedValues?: readonly string[];
+}
+
 export const ValidationSchemas = {
   email: {
     pattern:
@@ -22,6 +33,7 @@ export const ValidationSchemas = {
     maxLength: 254,
     minLength: 5,
     message: "Please enter a valid email address",
+    required: true,
   },
 
   name: {
@@ -29,6 +41,7 @@ export const ValidationSchemas = {
     maxLength: 100,
     minLength: 2,
     message: "Name can only contain letters, spaces, hyphens, and apostrophes",
+    required: true,
   },
 
   phoneIN: {
@@ -36,6 +49,15 @@ export const ValidationSchemas = {
     maxLength: 15,
     minLength: 10,
     message: "Please enter a valid Indian phone number",
+    required: false,
+  },
+
+  phoneIntl: {
+    pattern: /^\+?[1-9]\d{6,14}$/,
+    maxLength: 16,
+    minLength: 7,
+    message: "Please enter a valid phone number",
+    required: false,
   },
 
   safeText: {
@@ -43,6 +65,7 @@ export const ValidationSchemas = {
     maxLength: 1000,
     minLength: 1,
     message: "Text contains invalid characters",
+    required: false,
   },
 
   message: {
@@ -50,13 +73,23 @@ export const ValidationSchemas = {
     maxLength: 5000,
     minLength: 10,
     message: "Message contains invalid characters or is too short",
+    required: true,
   },
 
   productName: {
-    pattern: /^[a-zA-Z0-9\s\-_.,()&]+$/,
-    maxLength: 200,
+    pattern: /^[a-zA-Z0-9\s\-_.,()\&]+$/,
+    maxLength: 300,
     minLength: 2,
     message: "Product name contains invalid characters",
+    required: true,
+  },
+
+  companyName: {
+    pattern: /^[a-zA-Z0-9\s\-_.,()\&']+$/,
+    maxLength: 200,
+    minLength: 2,
+    message: "Company name contains invalid characters",
+    required: false,
   },
 
   quantity: {
@@ -64,6 +97,7 @@ export const ValidationSchemas = {
     maxLength: 15,
     minLength: 1,
     message: "Please enter a valid quantity",
+    required: false,
   },
 
   amount: {
@@ -71,6 +105,7 @@ export const ValidationSchemas = {
     maxLength: 15,
     minLength: 1,
     message: "Please enter a valid amount",
+    required: false,
   },
 
   url: {
@@ -79,6 +114,24 @@ export const ValidationSchemas = {
     maxLength: 2048,
     minLength: 10,
     message: "Please enter a valid URL",
+    required: false,
+  },
+
+  uuid: {
+    pattern:
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    maxLength: 36,
+    minLength: 36,
+    message: "Invalid ID format",
+    required: false,
+  },
+
+  slug: {
+    pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+    maxLength: 100,
+    minLength: 1,
+    message: "Invalid slug format",
+    required: false,
   },
 
   subject: {
@@ -88,8 +141,11 @@ export const ValidationSchemas = {
       "Trade Dispute",
       "Enterprise Solutions",
       "Technical Support",
-    ],
+    ] as const,
+    maxLength: 50,
+    minLength: 1,
     message: "Please select a valid subject",
+    required: false,
   },
 
   category: {
@@ -99,8 +155,31 @@ export const ValidationSchemas = {
       "Industrial Machinery",
       "Electronics",
       "Chemicals",
-    ],
+      "Agriculture",
+      "Health",
+      "Fashion",
+      "Industrial",
+    ] as const,
+    maxLength: 50,
+    minLength: 1,
     message: "Please select a valid category",
+    required: false,
+  },
+
+  location: {
+    pattern: /^[a-zA-Z0-9\s\-_.,()#\/]+$/,
+    maxLength: 200,
+    minLength: 2,
+    message: "Location contains invalid characters",
+    required: false,
+  },
+
+  source: {
+    pattern: /^[a-z0-9_]+$/,
+    maxLength: 50,
+    minLength: 1,
+    message: "Invalid source format",
+    required: false,
   },
 } as const;
 
@@ -110,23 +189,16 @@ export function sanitizeInput(input: string): string {
   }
 
   return input
-
     .replace(/\0/g, "")
-
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-
     .replace(/on\w+\s*=\s*["'][^"']*["']/gi, "")
-
     .replace(/javascript:/gi, "")
-
     .replace(/data:/gi, "")
-
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#x27;")
-
     .trim();
 }
 
@@ -136,13 +208,15 @@ export function sanitizeForDatabase(input: string): string {
   }
 
   return input
-
     .replace(/--/g, "")
     .replace(/\/\*/g, "")
     .replace(/\*\//g, "")
-
     .replace(/;/g, "")
-
+    .replace(/\bunion\b/gi, "")
+    .replace(/\bselect\b.*\bfrom\b/gi, "")
+    .replace(/\binsert\b.*\binto\b/gi, "")
+    .replace(/\bdelete\b.*\bfrom\b/gi, "")
+    .replace(/\bdrop\b.*\btable\b/gi, "")
     .trim();
 }
 
@@ -161,14 +235,30 @@ export function validateField(
   const errors: string[] = [];
   const schema = ValidationSchemas[schemaKey];
 
-  if (typeof value !== "string") {
+  if (value !== undefined && value !== null && typeof value !== "string") {
     return {
       isValid: false,
-      errors: ["Invalid input type"],
+      errors: ["Invalid input type - expected string"],
     };
   }
 
-  const trimmedValue = value.trim();
+  const stringValue = value as string | undefined | null;
+  const trimmedValue = stringValue?.trim() || "";
+
+  if ("required" in schema && schema.required && !trimmedValue) {
+    return {
+      isValid: false,
+      errors: ["This field is required"],
+    };
+  }
+
+  if (!trimmedValue && !("required" in schema && schema.required)) {
+    return {
+      isValid: true,
+      errors: [],
+      sanitizedValue: "",
+    };
+  }
 
   if ("allowedValues" in schema) {
     const allowedValues = schema.allowedValues as readonly string[];
@@ -190,7 +280,11 @@ export function validateField(
     errors.push(`Maximum length is ${schema.maxLength} characters`);
   }
 
-  if ("pattern" in schema && !schema.pattern.test(trimmedValue)) {
+  if (
+    "pattern" in schema &&
+    schema.pattern &&
+    !schema.pattern.test(trimmedValue)
+  ) {
     errors.push(schema.message);
   }
 
@@ -206,19 +300,29 @@ export function validateField(
 export function validateForm<T extends Record<string, unknown>>(
   formData: T,
   schemaMap: Partial<Record<keyof T, keyof typeof ValidationSchemas>>,
+  options: { rejectUnexpected?: boolean } = { rejectUnexpected: true },
 ): {
   isValid: boolean;
-  errors: Partial<Record<keyof T, string[]>>;
+  errors: Partial<Record<keyof T | "_unexpected", string[]>>;
   sanitizedData: Partial<T>;
 } {
-  const errors: Partial<Record<keyof T, string[]>> = {};
+  const errors: Partial<Record<keyof T | "_unexpected", string[]>> = {};
   const sanitizedData: Partial<T> = {};
   let isValid = true;
 
-  const allowedFields = Object.keys(schemaMap);
-  for (const field of Object.keys(formData)) {
-    if (!allowedFields.includes(field)) {
-      errors[field as keyof T] = [`Unexpected field: ${field}`];
+  const allowedFields = new Set(Object.keys(schemaMap));
+
+  if (options.rejectUnexpected) {
+    const unexpectedFields: string[] = [];
+    for (const field of Object.keys(formData)) {
+      if (!allowedFields.has(field)) {
+        unexpectedFields.push(field);
+      }
+    }
+    if (unexpectedFields.length > 0) {
+      errors._unexpected = [
+        `Unexpected fields: ${unexpectedFields.join(", ")}`,
+      ];
       isValid = false;
     }
   }
@@ -243,6 +347,92 @@ export function validateForm<T extends Record<string, unknown>>(
   return { isValid, errors, sanitizedData };
 }
 
+export async function parseAndValidateBody<T extends object>(
+  request: NextRequest,
+  schemaMap: Partial<Record<keyof T, keyof typeof ValidationSchemas>>,
+  maxBodySize: number = 100 * 1024,
+): Promise<
+  | { success: true; data: Record<string, unknown>; raw: T }
+  | { success: false; response: NextResponse }
+> {
+  try {
+    const contentLength = request.headers.get("content-length");
+    if (contentLength && parseInt(contentLength) > maxBodySize) {
+      return {
+        success: false,
+        response: NextResponse.json(
+          { error: "Request body too large" },
+          { status: 413 },
+        ),
+      };
+    }
+
+    const contentType = request.headers.get("content-type");
+    if (!contentType?.includes("application/json")) {
+      return {
+        success: false,
+        response: NextResponse.json(
+          { error: "Content-Type must be application/json" },
+          { status: 415 },
+        ),
+      };
+    }
+
+    let body: T;
+    try {
+      body = await request.json();
+    } catch {
+      return {
+        success: false,
+        response: NextResponse.json(
+          { error: "Invalid JSON in request body" },
+          { status: 400 },
+        ),
+      };
+    }
+
+    const bodyAsRecord = body as unknown as Record<string, unknown>;
+    const schemaMapAsRecord = schemaMap as Partial<
+      Record<string, keyof typeof ValidationSchemas>
+    >;
+    const validation = validateForm(bodyAsRecord, schemaMapAsRecord);
+
+    if (!validation.isValid) {
+      return {
+        success: false,
+        response: NextResponse.json(
+          { error: "Validation failed", errors: validation.errors },
+          { status: 400 },
+        ),
+      };
+    }
+
+    return { success: true, data: validation.sanitizedData, raw: body };
+  } catch {
+    return {
+      success: false,
+      response: NextResponse.json(
+        { error: "Failed to process request" },
+        { status: 500 },
+      ),
+    };
+  }
+}
+
+export function getClientIP(request: NextRequest): string {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0].trim();
+  }
+
+  const realIP = request.headers.get("x-real-ip");
+  if (realIP) {
+    return realIP;
+  }
+
+  return "unknown";
+}
+
 const rateLimitStore = new Map<string, RateLimitEntry>();
 
 export const RateLimitPresets: Record<string, RateLimitConfig> = {
@@ -260,7 +450,7 @@ export const RateLimitPresets: Record<string, RateLimitConfig> = {
 
   form: {
     windowMs: 60 * 1000,
-    maxRequests: 10,
+    maxRequests: 5,
     message: "Too many form submissions. Please slow down.",
   },
 
@@ -327,11 +517,16 @@ export function checkRateLimit(
   };
 }
 
-export function createRateLimitKey(ip: string, userId?: string): string {
-  if (userId) {
-    return `user:${userId}:${ip}`;
-  }
-  return `ip:${ip}`;
+export function createRateLimitKey(
+  ip: string,
+  userId?: string,
+  endpoint?: string,
+): string {
+  const parts = ["rl"];
+  if (userId) parts.push(`user:${userId}`);
+  parts.push(`ip:${ip}`);
+  if (endpoint) parts.push(`ep:${endpoint}`);
+  return parts.join(":");
 }
 
 export function generateSecureToken(length: number = 32): string {
@@ -348,10 +543,11 @@ export function generateSecureToken(length: number = 32): string {
       const crypto = require("crypto");
       return crypto.randomBytes(length).toString("hex");
     } catch {
-      console.warn("Secure random not available, using fallback");
+      console.warn("Secure random not available");
     }
   }
 
+  console.warn("Using insecure random fallback for token generation");
   let result = "";
   const characters = "0123456789abcdef";
   for (let i = 0; i < length * 2; i++) {
@@ -409,6 +605,7 @@ export default {
   ValidationSchemas,
   validateField,
   validateForm,
+  parseAndValidateBody,
 
   sanitizeInput,
   sanitizeForDatabase,
@@ -417,6 +614,7 @@ export default {
   RateLimitPresets,
   checkRateLimit,
   createRateLimitKey,
+  getClientIP,
 
   generateSecureToken,
   SecurityHeaders,

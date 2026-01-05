@@ -67,6 +67,7 @@ import {
   Gift,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/db";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -1093,12 +1094,77 @@ function IndustriesSection() {
   const isInView = useInView(ref, { once: true });
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [categories, setCategories] = useState<
+    { id: string; name: string; slug: string; image_url: string | null }[]
+  >([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("categories")
+          .select("id, name, slug, image_url")
+          .eq("is_active", true)
+          .order("display_order", { ascending: true })
+          .limit(12);
+
+        if (error) {
+          console.error("Error fetching categories:", error);
+        } else if (data) {
+          setCategories(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   const isDark = mounted && resolvedTheme === "dark";
+
+  const getIconForCategory = (name: string) => {
+    const lowerName = name.toLowerCase();
+    if (lowerName.includes("electronic")) return <Cpu className="w-6 h-6" />;
+    if (
+      lowerName.includes("textile") ||
+      lowerName.includes("apparel") ||
+      lowerName.includes("fashion")
+    )
+      return <Shirt className="w-6 h-6" />;
+    if (lowerName.includes("chemical") || lowerName.includes("dye"))
+      return <Beaker className="w-6 h-6" />;
+    if (lowerName.includes("machinery") || lowerName.includes("equipment"))
+      return <Cog className="w-6 h-6" />;
+    if (
+      lowerName.includes("healthcare") ||
+      lowerName.includes("pharma") ||
+      lowerName.includes("health")
+    )
+      return <Stethoscope className="w-6 h-6" />;
+    if (lowerName.includes("agriculture") || lowerName.includes("food"))
+      return <Sprout className="w-6 h-6" />;
+    if (lowerName.includes("construction") || lowerName.includes("building"))
+      return <Building2 className="w-6 h-6" />;
+    if (lowerName.includes("mining") || lowerName.includes("metal"))
+      return <Gem className="w-6 h-6" />;
+    if (lowerName.includes("industrial"))
+      return <Factory className="w-6 h-6" />;
+    if (lowerName.includes("logistics") || lowerName.includes("shipping"))
+      return <Truck className="w-6 h-6" />;
+    if (lowerName.includes("it") || lowerName.includes("service"))
+      return <Globe className="w-6 h-6" />;
+    return <Package className="w-6 h-6" />;
+  };
+
+  const displayData = categories.length > 0 ? categories : industries;
 
   return (
     <section
@@ -1141,7 +1207,9 @@ function IndustriesSection() {
               border: `1px solid ${isDark ? "rgba(20,184,166,0.2)" : "rgba(20,184,166,0.2)"}`,
             }}
           >
-            50+ Industries
+            {categories.length > 0
+              ? `${categories.length}+ Categories`
+              : "50+ Industries"}
           </motion.span>
           <h2
             className="text-4xl md:text-5xl font-black mb-4"
@@ -1161,87 +1229,104 @@ function IndustriesSection() {
           </p>
         </motion.div>
 
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"
-        >
-          {industries.map((industry, i) => (
-            <motion.div
-              key={i}
-              variants={staggerItem}
-              whileHover={{ y: -8, scale: 1.02 }}
-              className="group"
-            >
-              <Link
-                href={`/marketplace?category=${industry.name.toLowerCase().replace(/\s+/g, "-")}`}
-                className="block relative p-6 rounded-3xl overflow-hidden transition-all duration-300"
-                style={{
-                  backgroundColor: isDark
-                    ? "rgba(255,255,255,0.03)"
-                    : "#ffffff",
-                  border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
-                  boxShadow: isDark
-                    ? "0 4px 20px rgba(0,0,0,0.3)"
-                    : "0 4px 20px rgba(0,0,0,0.05)",
-                }}
-              >
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"
-                  style={{
-                    background: isDark
-                      ? "linear-gradient(135deg, rgba(20,184,166,0.1), rgba(16,185,129,0.1))"
-                      : "linear-gradient(135deg, rgba(20,184,166,0.05), rgba(16,185,129,0.05))",
-                  }}
-                />
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500" />
+          </div>
+        ) : (
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"
+          >
+            {displayData.map((item, i) => {
+              const categoryName = "name" in item ? item.name : "";
+              const categorySlug =
+                "slug" in item
+                  ? item.slug
+                  : categoryName.toLowerCase().replace(/\s+/g, "-");
+              const icon =
+                "icon" in item ? item.icon : getIconForCategory(categoryName);
+              const suppliers = "suppliers" in item ? item.suppliers : "1,000+";
 
-                <div
-                  className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{
-                    border: `1px solid ${isDark ? "rgba(20,184,166,0.4)" : "rgba(20,184,166,0.3)"}`,
-                  }}
-                />
-
+              return (
                 <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  className="relative w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-all duration-300"
-                  style={{
-                    background: isDark
-                      ? "linear-gradient(135deg, rgba(20,184,166,0.2), rgba(16,185,129,0.2))"
-                      : "linear-gradient(135deg, rgba(20,184,166,0.1), rgba(16,185,129,0.1))",
-                  }}
+                  key={i}
+                  variants={staggerItem}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  className="group"
                 >
-                  <span style={{ color: isDark ? "#2dd4bf" : "#0d9488" }}>
-                    {industry.icon}
-                  </span>
-                </motion.div>
-                <h3
-                  className="relative font-bold text-base mb-2 group-hover:text-teal-500 transition-colors"
-                  style={{ color: isDark ? "#ffffff" : "#111827" }}
-                >
-                  {industry.name}
-                </h3>
-                <div className="relative flex items-center gap-2">
-                  <span
-                    className="text-sm font-semibold"
-                    style={{ color: isDark ? "#22c55e" : "#16a34a" }}
-                  >
-                    {industry.suppliers}
-                  </span>
-                  <span
+                  <Link
+                    href={`/marketplace?category=${categorySlug}`}
+                    className="block relative p-6 rounded-3xl overflow-hidden transition-all duration-300"
                     style={{
-                      color: isDark ? "rgba(255,255,255,0.5)" : "#9ca3af",
+                      backgroundColor: isDark
+                        ? "rgba(255,255,255,0.03)"
+                        : "#ffffff",
+                      border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
+                      boxShadow: isDark
+                        ? "0 4px 20px rgba(0,0,0,0.3)"
+                        : "0 4px 20px rgba(0,0,0,0.05)",
                     }}
-                    className="text-sm"
                   >
-                    suppliers
-                  </span>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </motion.div>
+                    <div
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-3xl"
+                      style={{
+                        background: isDark
+                          ? "linear-gradient(135deg, rgba(20,184,166,0.1), rgba(16,185,129,0.1))"
+                          : "linear-gradient(135deg, rgba(20,184,166,0.05), rgba(16,185,129,0.05))",
+                      }}
+                    />
+
+                    <div
+                      className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{
+                        border: `1px solid ${isDark ? "rgba(20,184,166,0.4)" : "rgba(20,184,166,0.3)"}`,
+                      }}
+                    />
+
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      className="relative w-14 h-14 rounded-2xl flex items-center justify-center mb-5 transition-all duration-300"
+                      style={{
+                        background: isDark
+                          ? "linear-gradient(135deg, rgba(20,184,166,0.2), rgba(16,185,129,0.2))"
+                          : "linear-gradient(135deg, rgba(20,184,166,0.1), rgba(16,185,129,0.1))",
+                      }}
+                    >
+                      <span style={{ color: isDark ? "#2dd4bf" : "#0d9488" }}>
+                        {icon}
+                      </span>
+                    </motion.div>
+                    <h3
+                      className="relative font-bold text-base mb-2 group-hover:text-teal-500 transition-colors"
+                      style={{ color: isDark ? "#ffffff" : "#111827" }}
+                    >
+                      {categoryName}
+                    </h3>
+                    <div className="relative flex items-center gap-2">
+                      <span
+                        className="text-sm font-semibold"
+                        style={{ color: isDark ? "#22c55e" : "#16a34a" }}
+                      >
+                        {suppliers}
+                      </span>
+                      <span
+                        style={{
+                          color: isDark ? "rgba(255,255,255,0.5)" : "#9ca3af",
+                        }}
+                        className="text-sm"
+                      >
+                        suppliers
+                      </span>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        )}
       </div>
     </section>
   );
@@ -1408,12 +1493,63 @@ function FeaturedSuppliersSection() {
   const isInView = useInView(ref, { once: true });
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [sellers, setSellers] = useState<
+    {
+      id: string;
+      name: string;
+      slug: string;
+      tier: string;
+      rating: number;
+      response_time: string | null;
+      orders_count?: number;
+      description: string | null;
+    }[]
+  >([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    const fetchSellers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("sellers")
+          .select("id, name, slug, tier, rating, response_time, description")
+          .eq("is_active", true)
+          .order("rating", { ascending: false })
+          .limit(5);
+
+        if (error) {
+          console.error("Error fetching sellers:", error);
+        } else if (data) {
+          setSellers(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch sellers:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSellers();
+  }, []);
+
   const isDark = mounted && resolvedTheme === "dark";
+
+  const displayData =
+    sellers.length > 0
+      ? sellers.map((s) => ({
+          name: s.name,
+          category: s.description?.split(" ")[0] || "General",
+          rating: s.rating || 4.5,
+          responseTime: s.response_time || "< 2 hrs",
+          verified: s.tier || "Gold",
+          orders: s.orders_count ? `${s.orders_count}+` : "500+",
+          slug: s.slug,
+        }))
+      : featuredSuppliers;
 
   return (
     <section
@@ -1480,154 +1616,163 @@ function FeaturedSuppliersSection() {
           </Link>
         </motion.div>
 
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          {featuredSuppliers.map((supplier, i) => (
-            <motion.div
-              key={i}
-              variants={staggerItem}
-              whileHover={{ y: -10, scale: 1.02 }}
-              className="relative group rounded-3xl overflow-hidden"
-              style={{
-                backgroundColor: isDark ? "rgba(255,255,255,0.03)" : "#ffffff",
-                border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
-                boxShadow: isDark
-                  ? "0 4px 20px rgba(0,0,0,0.4)"
-                  : "0 4px 20px rgba(0,0,0,0.06)",
-              }}
-            >
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-500" />
+          </div>
+        ) : (
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {displayData.map((supplier, i) => (
+              <motion.div
+                key={i}
+                variants={staggerItem}
+                whileHover={{ y: -10, scale: 1.02 }}
+                className="relative group rounded-3xl overflow-hidden"
                 style={{
-                  background: isDark
-                    ? "linear-gradient(135deg, rgba(100,116,139,0.05), rgba(71,85,105,0.05))"
-                    : "linear-gradient(135deg, rgba(100,116,139,0.02), rgba(71,85,105,0.02))",
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.03)"
+                    : "#ffffff",
+                  border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
+                  boxShadow: isDark
+                    ? "0 4px 20px rgba(0,0,0,0.4)"
+                    : "0 4px 20px rgba(0,0,0,0.06)",
                 }}
-              />
+              >
+                <div
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: isDark
+                      ? "linear-gradient(135deg, rgba(100,116,139,0.05), rgba(71,85,105,0.05))"
+                      : "linear-gradient(135deg, rgba(100,116,139,0.02), rgba(71,85,105,0.02))",
+                  }}
+                />
 
-              <div className="relative p-6">
-                <div className="flex items-start justify-between mb-5">
-                  <div className="flex items-center gap-4">
-                    <motion.div
-                      whileHover={{ rotate: 360 }}
-                      transition={{ duration: 0.5 }}
-                      className="w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-lg"
-                      style={{
-                        background: "linear-gradient(135deg, #64748b, #475569)",
-                        color: "#ffffff",
-                      }}
-                    >
-                      {supplier.name.charAt(0)}
-                    </motion.div>
-                    <div>
-                      <h3
-                        className="font-bold text-lg"
-                        style={{ color: isDark ? "#ffffff" : "#111827" }}
-                      >
-                        {supplier.name}
-                      </h3>
-                      <p
-                        className="text-sm"
+                <div className="relative p-6">
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="flex items-center gap-4">
+                      <motion.div
+                        whileHover={{ rotate: 360 }}
+                        transition={{ duration: 0.5 }}
+                        className="w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-lg"
                         style={{
-                          color: isDark ? "rgba(255,255,255,0.5)" : "#6b7280",
+                          background:
+                            "linear-gradient(135deg, #64748b, #475569)",
+                          color: "#ffffff",
                         }}
                       >
-                        {supplier.category}
-                      </p>
-                    </div>
-                  </div>
-                  <span
-                    className="px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1"
-                    style={{
-                      background:
-                        supplier.verified === "Gold"
-                          ? "linear-gradient(135deg, #f59e0b, #d97706)"
-                          : isDark
-                            ? "rgba(255,255,255,0.1)"
-                            : "#f3f4f6",
-                      color:
-                        supplier.verified === "Gold"
-                          ? "#ffffff"
-                          : isDark
-                            ? "#ffffff"
-                            : "#374151",
-                    }}
-                  >
-                    {supplier.verified === "Gold" && "✓ "}
-                    {supplier.verified}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-3 mb-5">
-                  {[
-                    {
-                      icon: <Star className="w-4 h-4" />,
-                      value: supplier.rating,
-                      label: "Rating",
-                      color: "#eab308",
-                    },
-                    {
-                      icon: <Clock className="w-4 h-4" />,
-                      value: supplier.responseTime,
-                      label: "Response",
-                      color: "#64748b",
-                    },
-                    {
-                      icon: <Package className="w-4 h-4" />,
-                      value: supplier.orders,
-                      label: "Orders",
-                      color: "#22c55e",
-                    },
-                  ].map((stat, j) => (
-                    <div
-                      key={j}
-                      className="text-center p-3 rounded-2xl"
-                      style={{
-                        backgroundColor: isDark
-                          ? "rgba(255,255,255,0.03)"
-                          : "#f8fafc",
-                        border: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)"}`,
-                      }}
-                    >
-                      <div className="flex items-center justify-center gap-1.5 mb-1">
-                        <span style={{ color: stat.color }}>{stat.icon}</span>
-                        <span
-                          className="font-bold text-sm"
+                        {supplier.name.charAt(0)}
+                      </motion.div>
+                      <div>
+                        <h3
+                          className="font-bold text-lg"
                           style={{ color: isDark ? "#ffffff" : "#111827" }}
                         >
-                          {stat.value}
-                        </span>
+                          {supplier.name}
+                        </h3>
+                        <p
+                          className="text-sm"
+                          style={{
+                            color: isDark ? "rgba(255,255,255,0.5)" : "#6b7280",
+                          }}
+                        >
+                          {supplier.category}
+                        </p>
                       </div>
-                      <span
-                        className="text-[10px]"
+                    </div>
+                    <span
+                      className="px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1"
+                      style={{
+                        background:
+                          supplier.verified === "Gold"
+                            ? "linear-gradient(135deg, #f59e0b, #d97706)"
+                            : isDark
+                              ? "rgba(255,255,255,0.1)"
+                              : "#f3f4f6",
+                        color:
+                          supplier.verified === "Gold"
+                            ? "#ffffff"
+                            : isDark
+                              ? "#ffffff"
+                              : "#374151",
+                      }}
+                    >
+                      {supplier.verified === "Gold" && "✓ "}
+                      {supplier.verified}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3 mb-5">
+                    {[
+                      {
+                        icon: <Star className="w-4 h-4" />,
+                        value: supplier.rating,
+                        label: "Rating",
+                        color: "#eab308",
+                      },
+                      {
+                        icon: <Clock className="w-4 h-4" />,
+                        value: supplier.responseTime,
+                        label: "Response",
+                        color: "#64748b",
+                      },
+                      {
+                        icon: <Package className="w-4 h-4" />,
+                        value: supplier.orders,
+                        label: "Orders",
+                        color: "#22c55e",
+                      },
+                    ].map((stat, j) => (
+                      <div
+                        key={j}
+                        className="text-center p-3 rounded-2xl"
                         style={{
-                          color: isDark ? "rgba(255,255,255,0.4)" : "#9ca3af",
+                          backgroundColor: isDark
+                            ? "rgba(255,255,255,0.03)"
+                            : "#f8fafc",
+                          border: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)"}`,
                         }}
                       >
-                        {stat.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                        <div className="flex items-center justify-center gap-1.5 mb-1">
+                          <span style={{ color: stat.color }}>{stat.icon}</span>
+                          <span
+                            className="font-bold text-sm"
+                            style={{ color: isDark ? "#ffffff" : "#111827" }}
+                          >
+                            {stat.value}
+                          </span>
+                        </div>
+                        <span
+                          className="text-[10px]"
+                          style={{
+                            color: isDark ? "rgba(255,255,255,0.4)" : "#9ca3af",
+                          }}
+                        >
+                          {stat.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
 
-                <Link
-                  href="/seller"
-                  className="block text-center py-3 rounded-xl font-bold transition-all group-hover:shadow-lg"
-                  style={{
-                    background: "linear-gradient(135deg, #334155, #1e293b)",
-                    color: "#ffffff",
-                  }}
-                >
-                  View Profile →
-                </Link>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+                  <Link
+                    href={`/seller/${"slug" in supplier ? supplier.slug : "verified-seller"}`}
+                    className="block text-center py-3 rounded-xl font-bold transition-all group-hover:shadow-lg"
+                    style={{
+                      background: "linear-gradient(135deg, #334155, #1e293b)",
+                      color: "#ffffff",
+                    }}
+                  >
+                    View Profile →
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </div>
     </section>
   );
@@ -1639,6 +1784,9 @@ function RFQSection() {
     quantity: "",
     email: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -1647,6 +1795,63 @@ function RFQSection() {
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!formData.product.trim()) {
+      setError("Please enter a product name");
+      return;
+    }
+    if (
+      !formData.email.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
+    ) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/rfq", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contactName: "Website Visitor",
+          email: formData.email,
+          productName: formData.product,
+          quantity: formData.quantity || "Not specified",
+          source: "landing_page_rfq",
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          setError("Too many submissions. Please try again later.");
+        } else {
+          setError(result.error || "Failed to submit. Please try again.");
+        }
+        return;
+      }
+
+      setIsSubmitted(true);
+      setFormData({ product: "", quantity: "", email: "" });
+
+      setTimeout(() => {
+        setIsSubmitted(false);
+      }, 5000);
+    } catch (err) {
+      setError("Network error. Please check your connection.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <section
@@ -1686,103 +1891,214 @@ function RFQSection() {
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="rounded-2xl p-6 md:p-8 shadow-2xl"
+            className="rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden"
             style={{
               backgroundColor: isDark ? "#18181b" : "#ffffff",
               borderWidth: 1,
               borderColor: isDark ? "#27272a" : "#f3f4f6",
             }}
           >
-            <h3
-              className="text-xl font-bold mb-6"
-              style={{ color: isDark ? "#ffffff" : "#111827" }}
-            >
-              Request for Quote
-            </h3>
-            <form className="space-y-4">
-              <div>
-                <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: isDark ? "#d4d4d8" : "#374151" }}
+            <AnimatePresence mode="wait">
+              {isSubmitted ? (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className="text-center py-12"
                 >
-                  Product Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., Cotton Yarn, Steel Pipes"
-                  value={formData.product}
-                  onChange={(e) =>
-                    setFormData({ ...formData, product: e.target.value })
-                  }
-                  className="w-full px-4 py-3 rounded-xl focus:outline-none transition-colors"
-                  style={{
-                    backgroundColor: isDark ? "#27272a" : "#ffffff",
-                    borderWidth: 2,
-                    borderColor: isDark ? "#3f3f46" : "#e5e7eb",
-                    color: isDark ? "#ffffff" : "#111827",
-                  }}
-                />
-              </div>
-              <div>
-                <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: isDark ? "#d4d4d8" : "#374151" }}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{
+                      type: "spring",
+                      damping: 10,
+                      stiffness: 200,
+                      delay: 0.1,
+                    }}
+                    className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6"
+                  >
+                    <motion.div
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{
+                        type: "spring",
+                        damping: 12,
+                        stiffness: 200,
+                        delay: 0.3,
+                      }}
+                    >
+                      <CheckCircle2 className="w-10 h-10 text-green-500" />
+                    </motion.div>
+                  </motion.div>
+                  <motion.h3
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-2xl font-bold mb-2"
+                    style={{ color: isDark ? "#ffffff" : "#111827" }}
+                  >
+                    Quote Request Sent!
+                  </motion.h3>
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-gray-500"
+                  >
+                    We&apos;ll get back to you within 24 hours with multiple
+                    quotes.
+                  </motion.p>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="mt-6 flex justify-center gap-2"
+                  >
+                    {[0, 1, 2].map((i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ y: 0 }}
+                        animate={{ y: [-5, 0, -5] }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          delay: i * 0.2,
+                        }}
+                        className="w-3 h-3 bg-green-500/50 rounded-full"
+                      />
+                    ))}
+                  </motion.div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="form"
+                  initial={{ opacity: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
                 >
-                  Quantity Required
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., 1000 units, 5 tons"
-                  value={formData.quantity}
-                  onChange={(e) =>
-                    setFormData({ ...formData, quantity: e.target.value })
-                  }
-                  className="w-full px-4 py-3 rounded-xl focus:outline-none transition-colors"
-                  style={{
-                    backgroundColor: isDark ? "#27272a" : "#ffffff",
-                    borderWidth: 2,
-                    borderColor: isDark ? "#3f3f46" : "#e5e7eb",
-                    color: isDark ? "#ffffff" : "#111827",
-                  }}
-                />
-              </div>
-              <div>
-                <label
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: isDark ? "#d4d4d8" : "#374151" }}
-                >
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full px-4 py-3 rounded-xl focus:outline-none transition-colors"
-                  style={{
-                    backgroundColor: isDark ? "#27272a" : "#ffffff",
-                    borderWidth: 2,
-                    borderColor: isDark ? "#3f3f46" : "#e5e7eb",
-                    color: isDark ? "#ffffff" : "#111827",
-                  }}
-                />
-              </div>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                type="submit"
-                className="w-full font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2"
-                style={{
-                  backgroundColor: isDark ? "#ffffff" : "#111827",
-                  color: isDark ? "#111827" : "#ffffff",
-                }}
-              >
-                <Zap className="w-5 h-5" />
-                Get Free Quotes
-              </motion.button>
-            </form>
+                  <h3
+                    className="text-xl font-bold mb-6"
+                    style={{ color: isDark ? "#ffffff" : "#111827" }}
+                  >
+                    Request for Quote
+                  </h3>
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm"
+                    >
+                      {error}
+                    </motion.div>
+                  )}
+                  <form className="space-y-4" onSubmit={handleSubmit}>
+                    <div>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: isDark ? "#d4d4d8" : "#374151" }}
+                      >
+                        Product Name *
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g., Cotton Yarn, Steel Pipes"
+                        value={formData.product}
+                        onChange={(e) =>
+                          setFormData({ ...formData, product: e.target.value })
+                        }
+                        disabled={isSubmitting}
+                        className="w-full px-4 py-3 rounded-xl focus:outline-none transition-colors disabled:opacity-50"
+                        style={{
+                          backgroundColor: isDark ? "#27272a" : "#ffffff",
+                          borderWidth: 2,
+                          borderColor: isDark ? "#3f3f46" : "#e5e7eb",
+                          color: isDark ? "#ffffff" : "#111827",
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: isDark ? "#d4d4d8" : "#374151" }}
+                      >
+                        Quantity Required
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g., 1000 units, 5 tons"
+                        value={formData.quantity}
+                        onChange={(e) =>
+                          setFormData({ ...formData, quantity: e.target.value })
+                        }
+                        disabled={isSubmitting}
+                        className="w-full px-4 py-3 rounded-xl focus:outline-none transition-colors disabled:opacity-50"
+                        style={{
+                          backgroundColor: isDark ? "#27272a" : "#ffffff",
+                          borderWidth: 2,
+                          borderColor: isDark ? "#3f3f46" : "#e5e7eb",
+                          color: isDark ? "#ffffff" : "#111827",
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: isDark ? "#d4d4d8" : "#374151" }}
+                      >
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        placeholder="your@email.com"
+                        value={formData.email}
+                        onChange={(e) =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
+                        disabled={isSubmitting}
+                        className="w-full px-4 py-3 rounded-xl focus:outline-none transition-colors disabled:opacity-50"
+                        style={{
+                          backgroundColor: isDark ? "#27272a" : "#ffffff",
+                          borderWidth: 2,
+                          borderColor: isDark ? "#3f3f46" : "#e5e7eb",
+                          color: isDark ? "#ffffff" : "#111827",
+                        }}
+                      />
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+                      whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                      style={{
+                        backgroundColor: isDark ? "#ffffff" : "#111827",
+                        color: isDark ? "#111827" : "#ffffff",
+                      }}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{
+                              duration: 1,
+                              repeat: Infinity,
+                              ease: "linear",
+                            }}
+                            className="w-5 h-5 border-2 border-current border-t-transparent rounded-full"
+                          />
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="w-5 h-5" />
+                          Get Free Quotes
+                        </>
+                      )}
+                    </motion.button>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
       </div>

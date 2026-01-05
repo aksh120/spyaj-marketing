@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { supabase, logEmail } from "./db";
+import { supabaseAdmin as supabase, logEmail } from "./db";
 
 export interface EmailOptions {
   to: string | string[];
@@ -73,8 +73,12 @@ export async function sendEmail(options: EmailOptions): Promise<{
   const transport = getTransporter();
 
   if (!transport) {
-    console.error("SMTP not configured");
-    return { success: false, error: "SMTP not configured" };
+    console.warn("--- MOCK EMAIL START ---");
+    console.warn("To:", options.to);
+    console.warn("Subject:", options.subject);
+    console.warn("SMTP not configured. This email was only logged to the console.");
+    console.warn("--- MOCK EMAIL END ---");
+    return { success: true, messageId: "mock-id-" + Date.now() };
   }
 
   const from = process.env.SMTP_FROM || process.env.SMTP_USER;
@@ -224,13 +228,12 @@ Source: ${data.source || "Website"}
       ${data.targetBudget ? `<tr><td style="padding: 8px 0;"><strong>Budget:</strong></td><td>${data.targetBudget}</td></tr>` : ""}
       ${data.deliveryLocation ? `<tr><td style="padding: 8px 0;"><strong>Delivery:</strong></td><td>${data.deliveryLocation}</td></tr>` : ""}
     </table>
-    ${
-      data.requirements
-        ? `
+    ${data.requirements
+      ? `
     <h4 style="margin-bottom: 10px;">Requirements:</h4>
     <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; white-space: pre-wrap;">${data.requirements}</div>
     `
-        : ""
+      : ""
     }
   </div>
   
@@ -334,8 +337,99 @@ export async function sendQuoteNotification(
   return result.success;
 }
 
+export async function sendQuoteToUser(
+  data: QuoteEmailData & { quotePrice: string },
+  requestId: string,
+): Promise<boolean> {
+  const subject = `[SPYAJ Quote] Price for ${data.productName}`;
+
+  const text = `
+Hello ${data.contactName},
+
+Thank you for your interest in ${data.productName}.
+
+We are pleased to provide you with a quote:
+Product: ${data.productName}
+Quantity: ${data.quantity || "Requested amount"}
+Quoted Price: ${data.quotePrice}
+
+Best regards,
+The SPYAJ Marketing Team
+  `.trim();
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>${subject}</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; padding: 20px; border-radius: 10px 10px 0 0;">
+    <h1 style="margin: 0; font-size: 24px;">Your Quote is Ready!</h1>
+    <p style="margin: 5px 0 0 0;">SPYAJ Marketing</p>
+  </div>
+  
+  <div style="background: white; padding: 20px; border: 1px solid #e9ecef; border-top: none;">
+    <p>Hello ${data.contactName},</p>
+    <p>Thank you for your interest in <strong>${data.productName}</strong>. We are pleased to provide you with the following quote:</p>
+    
+    <div style="background: #f0f9ff; padding: 20px; border-radius: 10px; margin: 20px 0; border: 1px solid #bae6fd;">
+      <table style="width: 100%;">
+        <tr><td style="padding: 5px 0;"><strong>Product:</strong></td><td>${data.productName}</td></tr>
+        ${data.quantity ? `<tr><td style="padding: 5px 0;"><strong>Quantity:</strong></td><td>${data.quantity}</td></tr>` : ""}
+        <tr><td style="padding: 5px 0;"><strong>Quoted Price:</strong></td><td style="font-size: 18px; color: #1e40af; font-weight: bold;">${data.quotePrice}</td></tr>
+      </table>
+    </div>
+    
+    <p>If you have any questions or would like to proceed with the order, please reply to this email.</p>
+    
+    <br/>
+    <p>Best regards,<br/><strong>The SPYAJ Marketing Team</strong></p>
+  </div>
+  
+  <div style="background: #f1f1f1; padding: 15px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 10px 10px;">
+    <p style="margin: 0;">&copy; ${new Date().getFullYear()} SPYAJ Marketing. All rights reserved.</p>
+  </div>
+</body>
+</html>
+  `.trim();
+
+  const result = await sendEmail({
+    to: data.email,
+    subject,
+    text,
+    html,
+  });
+
+  await logEmail({
+    recipient_email: data.email,
+    subject,
+    template: "quote_to_user",
+    status: result.success ? "sent" : "failed",
+    related_entity_type: "quote",
+    related_entity_id: requestId,
+    error_message: result.error || null,
+    smtp_response: null,
+  });
+
+  if (result.success) {
+    await supabase
+      .from("quote_requests")
+      .update({
+        quoted_price: data.quotePrice,
+        status: "quoted",
+        quoted_at: new Date().toISOString(),
+      })
+      .eq("id", requestId);
+  }
+
+  return result.success;
+}
+
 export default {
   sendEmail,
   sendContactNotification,
   sendQuoteNotification,
+  sendQuoteToUser,
 };

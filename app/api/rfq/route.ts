@@ -2,107 +2,101 @@ import { NextRequest, NextResponse } from "next/server";
 import { createQuoteRequest } from "@/lib/db";
 import { sendQuoteNotification } from "@/lib/email";
 import {
-  validateField,
-  sanitizeInput,
+  parseAndValidateBody,
   checkRateLimit,
   RateLimitPresets,
+  getClientIP,
+  ValidationSchemas,
 } from "@/lib/security";
+
+interface RFQFormData {
+  contactName: string;
+  companyName?: string;
+  email: string;
+  phone?: string;
+  productName: string;
+  category?: string;
+  quantity?: string;
+  targetBudget?: string;
+  requirements?: string;
+  deliveryLocation?: string;
+  productId?: string;
+  source?: string;
+}
+
+const RFQ_SCHEMA: Partial<
+  Record<keyof RFQFormData, keyof typeof ValidationSchemas>
+> = {
+  contactName: "name",
+  companyName: "companyName",
+  email: "email",
+  phone: "phoneIN",
+  productName: "productName",
+  category: "category",
+  quantity: "safeText",
+  targetBudget: "safeText",
+  requirements: "safeText",
+  deliveryLocation: "location",
+  productId: "uuid",
+  source: "source",
+};
 
 export async function POST(request: NextRequest) {
   try {
-    const forwardedFor = request.headers.get("x-forwarded-for");
-    const clientIP = forwardedFor
-      ? forwardedFor.split(",")[0].trim()
-      : "unknown";
+    const clientIP = getClientIP(request);
 
     const rateLimitKey = `rfq:${clientIP}`;
     const rateLimit = checkRateLimit(rateLimitKey, RateLimitPresets.form);
 
     if (rateLimit.isLimited) {
+      const retryAfter = Math.ceil((rateLimit.resetTime - Date.now()) / 1000);
       return NextResponse.json(
-        { error: "Too many requests. Please try again later." },
+        {
+          error: "Too many requests",
+          message: "Please wait before submitting another quote request.",
+          retryAfter,
+        },
         {
           status: 429,
           headers: {
-            "Retry-After": Math.ceil(
-              (rateLimit.resetTime - Date.now()) / 1000,
+            "Retry-After": retryAfter.toString(),
+            "X-RateLimit-Limit": RateLimitPresets.form.maxRequests.toString(),
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": Math.ceil(
+              rateLimit.resetTime / 1000,
             ).toString(),
           },
         },
       );
     }
 
-    const body = await request.json();
-    const {
-      contactName,
-      companyName,
-      email,
-      phone,
-      productName,
-      category,
-      quantity,
-      targetBudget,
-      requirements,
-      deliveryLocation,
-      productId,
-      source,
-    } = body;
+    const validation = await parseAndValidateBody<RFQFormData>(
+      request,
+      RFQ_SCHEMA,
+      100 * 1024,
+    );
 
-    const errors: Record<string, string> = {};
-
-    const nameResult = validateField(contactName, "name");
-    if (!nameResult.isValid) {
-      errors.contactName = nameResult.errors[0];
+    if (!validation.success) {
+      return validation.response;
     }
 
-    const emailResult = validateField(email, "email");
-    if (!emailResult.isValid) {
-      errors.email = emailResult.errors[0];
-    }
-
-    if (!productName || productName.trim().length < 2) {
-      errors.productName = "Product name is required";
-    }
-
-    if (Object.keys(errors).length > 0) {
-      return NextResponse.json(
-        { error: "Validation failed", errors },
-        { status: 400 },
-      );
-    }
-
-    const sanitizedData = {
-      contact_name: sanitizeInput(contactName),
-      company_name: companyName ? sanitizeInput(companyName) : null,
-      email: sanitizeInput(email),
-      phone: phone ? sanitizeInput(phone) : null,
-      product_name: sanitizeInput(productName),
-      category: category ? sanitizeInput(category) : null,
-      quantity: quantity ? sanitizeInput(quantity) : null,
-      target_budget: targetBudget ? sanitizeInput(targetBudget) : null,
-      requirements: requirements ? sanitizeInput(requirements) : null,
-      delivery_location: deliveryLocation
-        ? sanitizeInput(deliveryLocation)
-        : null,
-      product_id: productId || null,
-      source: source ? sanitizeInput(source) : "rfq_page",
-    };
+    const { data: sanitizedData } = validation;
 
     const userAgent = request.headers.get("user-agent") || null;
 
     const quoteRequest = await createQuoteRequest({
-      contact_name: sanitizedData.contact_name,
-      company_name: sanitizedData.company_name,
-      email: sanitizedData.email,
-      phone: sanitizedData.phone,
-      product_name: sanitizedData.product_name,
-      category: sanitizedData.category,
-      quantity: sanitizedData.quantity,
-      target_budget: sanitizedData.target_budget,
-      requirements: sanitizedData.requirements,
-      delivery_location: sanitizedData.delivery_location,
-      product_id: sanitizedData.product_id,
-      source: sanitizedData.source,
+      contact_name: sanitizedData.contactName as string,
+      company_name: (sanitizedData.companyName as string) || null,
+      email: sanitizedData.email as string,
+      phone: (sanitizedData.phone as string) || null,
+      product_name: sanitizedData.productName as string,
+      category: (sanitizedData.category as string) || null,
+      quantity: (sanitizedData.quantity as string) || null,
+      target_budget: (sanitizedData.targetBudget as string) || null,
+      requirements: (sanitizedData.requirements as string) || null,
+      delivery_location: (sanitizedData.deliveryLocation as string) || null,
+      product_id: (sanitizedData.productId as string) || null,
+      source: (sanitizedData.source as string) || "rfq_page",
       ip_address: clientIP,
       user_agent: userAgent,
       attachments: [],
@@ -110,17 +104,17 @@ export async function POST(request: NextRequest) {
 
     sendQuoteNotification(
       {
-        contactName: sanitizedData.contact_name,
-        companyName: sanitizedData.company_name || undefined,
-        email: sanitizedData.email,
-        phone: sanitizedData.phone || undefined,
-        productName: sanitizedData.product_name,
-        category: sanitizedData.category || undefined,
-        quantity: sanitizedData.quantity || undefined,
-        targetBudget: sanitizedData.target_budget || undefined,
-        requirements: sanitizedData.requirements || undefined,
-        deliveryLocation: sanitizedData.delivery_location || undefined,
-        source: sanitizedData.source,
+        contactName: sanitizedData.contactName as string,
+        companyName: sanitizedData.companyName as string | undefined,
+        email: sanitizedData.email as string,
+        phone: sanitizedData.phone as string | undefined,
+        productName: sanitizedData.productName as string,
+        category: sanitizedData.category as string | undefined,
+        quantity: sanitizedData.quantity as string | undefined,
+        targetBudget: sanitizedData.targetBudget as string | undefined,
+        requirements: sanitizedData.requirements as string | undefined,
+        deliveryLocation: sanitizedData.deliveryLocation as string | undefined,
+        source: (sanitizedData.source as string) || "rfq_page",
       },
       quoteRequest.id,
     ).catch((err) => {
@@ -144,5 +138,22 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
+  return NextResponse.json(
+    { error: "Method not allowed" },
+    { status: 405, headers: { Allow: "POST" } },
+  );
+}
+
+export async function PUT() {
+  return NextResponse.json(
+    { error: "Method not allowed" },
+    { status: 405, headers: { Allow: "POST" } },
+  );
+}
+
+export async function DELETE() {
+  return NextResponse.json(
+    { error: "Method not allowed" },
+    { status: 405, headers: { Allow: "POST" } },
+  );
 }

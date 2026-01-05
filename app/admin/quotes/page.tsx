@@ -17,7 +17,9 @@ import {
   Clock,
   XCircle,
   ChevronDown,
+  Trash2,
 } from "lucide-react";
+import { supabaseAdmin } from "@/lib/db";
 
 interface QuoteRequest {
   id: string;
@@ -33,6 +35,7 @@ interface QuoteRequest {
   status: string;
   source: string | null;
   createdAt: string;
+  quoted_price?: string;
 }
 
 const statusColors: Record<string, { bg: string; text: string }> = {
@@ -59,6 +62,8 @@ export default function AdminQuotesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedQuote, setSelectedQuote] = useState<QuoteRequest | null>(null);
+  const [quotePrice, setQuotePrice] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
     fetchQuotes();
@@ -66,11 +71,81 @@ export default function AdminQuotesPage() {
 
   const fetchQuotes = async () => {
     try {
-      setQuotes([]);
+      const { data, error } = await supabaseAdmin
+        .from("quote_requests")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Failed to fetch quotes:", error);
+        setQuotes([]);
+      } else if (data) {
+        setQuotes(
+          data.map((item) => ({
+            id: item.id,
+            contactName: item.contact_name,
+            companyName: item.company_name,
+            email: item.email,
+            phone: item.phone,
+            productName: item.product_name,
+            category: item.category,
+            quantity: item.quantity,
+            targetBudget: item.target_budget,
+            requirements: item.requirements,
+            status: item.status || "open",
+            source: item.source,
+            createdAt: item.created_at,
+            quoted_price: item.quoted_price,
+          })),
+        );
+      }
     } catch (error) {
       console.error("Failed to fetch quotes:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateQuoteStatus = async (id: string, newStatus: string) => {
+    try {
+      const { error } = await supabaseAdmin
+        .from("quote_requests")
+        .update({ status: newStatus })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setQuotes((prev) =>
+        prev.map((q) => (q.id === id ? { ...q, status: newStatus } : q)),
+      );
+      if (selectedQuote?.id === id) {
+        setSelectedQuote((prev) => (prev ? { ...prev, status: newStatus } : null));
+      }
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      alert("Failed to update status. Please try again.");
+    }
+  };
+
+  const handleDeleteQuote = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this quote request?"))
+      return;
+
+    try {
+      const { error } = await supabaseAdmin
+        .from("quote_requests")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setQuotes((prev) => prev.filter((q) => q.id !== id));
+      if (selectedQuote?.id === id) {
+        setSelectedQuote(null);
+      }
+    } catch (error) {
+      console.error("Failed to delete quote:", error);
+      alert("Failed to delete quote request. Please try again.");
     }
   };
 
@@ -84,6 +159,50 @@ export default function AdminQuotesPage() {
     return matchesSearch && matchesStatus;
   });
 
+  const handleSendQuote = async () => {
+    if (!selectedQuote) return;
+    if (!quotePrice.trim()) {
+      alert("Please enter a quote price");
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      const response = await fetch("/api/admin/send-quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId: selectedQuote.id,
+          contactName: selectedQuote.contactName,
+          email: selectedQuote.email,
+          productName: selectedQuote.productName,
+          quantity: selectedQuote.quantity,
+          quotePrice: quotePrice,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to send quote");
+
+      setQuotes((prev) =>
+        prev.map((q) =>
+          q.id === selectedQuote.id
+            ? { ...q, status: "quoted", quoted_price: quotePrice }
+            : q
+        )
+      );
+      setSelectedQuote((prev) =>
+        prev ? { ...prev, status: "quoted", quoted_price: quotePrice } : null
+      );
+      setQuotePrice("");
+      alert("Quote sent successfully!");
+    } catch (error) {
+      console.error("Failed to send quote:", error);
+      alert("Failed to send quote. Please try again.");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-IN", {
       day: "numeric",
@@ -96,23 +215,22 @@ export default function AdminQuotesPage() {
 
   return (
     <div className="space-y-6">
-      {}
+      { }
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Quote Requests</h1>
         <p className="text-slate-500">Manage incoming quote and RFQ requests</p>
       </div>
 
-      {}
+      { }
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {["open", "reviewing", "quoted", "accepted"].map((status) => (
+        {["open", "reviewing", "accepted", "rejected"].map((status) => (
           <button
             key={status}
             onClick={() => setStatusFilter(status)}
-            className={`p-4 rounded-xl border ${
-              statusFilter === status
-                ? "border-blue-500 bg-blue-50"
-                : "border-slate-200 bg-white hover:bg-slate-50"
-            } transition-colors`}
+            className={`p-4 rounded-xl border ${statusFilter === status
+              ? "border-blue-500 bg-blue-50"
+              : "border-slate-200 bg-white hover:bg-slate-50"
+              } transition-colors`}
           >
             <div className="flex items-center gap-2 mb-2">
               <div
@@ -131,7 +249,7 @@ export default function AdminQuotesPage() {
         ))}
       </div>
 
-      {}
+      { }
       <div className="bg-white rounded-xl border border-slate-200 p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
@@ -162,7 +280,7 @@ export default function AdminQuotesPage() {
         </div>
       </div>
 
-      {}
+      { }
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -188,10 +306,15 @@ export default function AdminQuotesPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="p-4 hover:bg-slate-50 cursor-pointer transition-colors"
-                onClick={() => setSelectedQuote(quote)}
+                onClick={() => {
+                  setSelectedQuote(quote);
+                  if (quote.status === "open") {
+                    updateQuoteStatus(quote.id, "reviewing");
+                  }
+                }}
               >
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
-                  {}
+                  { }
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="font-semibold text-slate-900 truncate">
@@ -222,7 +345,7 @@ export default function AdminQuotesPage() {
                     </div>
                   </div>
 
-                  {}
+                  { }
                   <div className="flex items-center gap-4 text-sm">
                     {quote.quantity && (
                       <span className="px-3 py-1 bg-slate-100 rounded-lg">
@@ -238,6 +361,15 @@ export default function AdminQuotesPage() {
                       <Calendar className="w-4 h-4" />
                       {formatDate(quote.createdAt)}
                     </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteQuote(quote.id);
+                      }}
+                      className="p-2 hover:bg-red-100 rounded-lg text-red-500"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                     <ChevronDown className="w-5 h-5 text-slate-400" />
                   </div>
                 </div>
@@ -247,7 +379,7 @@ export default function AdminQuotesPage() {
         )}
       </div>
 
-      {}
+      { }
       {selectedQuote && (
         <div
           className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
@@ -273,7 +405,7 @@ export default function AdminQuotesPage() {
               </div>
             </div>
             <div className="p-6 space-y-6">
-              {}
+              { }
               <div className="flex items-center gap-3">
                 <span
                   className={`px-3 py-1.5 rounded-full font-medium ${statusColors[selectedQuote.status].bg} ${statusColors[selectedQuote.status].text}`}
@@ -285,7 +417,7 @@ export default function AdminQuotesPage() {
                 </span>
               </div>
 
-              {}
+              { }
               <div>
                 <h3 className="text-sm font-medium text-slate-500 mb-2">
                   Product Requested
@@ -300,7 +432,7 @@ export default function AdminQuotesPage() {
                 )}
               </div>
 
-              {}
+              { }
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 mb-2">
@@ -344,7 +476,7 @@ export default function AdminQuotesPage() {
                 )}
               </div>
 
-              {}
+              { }
               <div className="grid grid-cols-2 gap-4">
                 {selectedQuote.quantity && (
                   <div>
@@ -366,7 +498,7 @@ export default function AdminQuotesPage() {
                 )}
               </div>
 
-              {}
+              { }
               {selectedQuote.requirements && (
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 mb-2">
@@ -378,14 +510,64 @@ export default function AdminQuotesPage() {
                 </div>
               )}
 
-              {}
+              {selectedQuote.status === "reviewing" || selectedQuote.status === "open" ? (
+                <div>
+                  <h3 className="text-sm font-medium text-slate-500 mb-2">
+                    Quote Price
+                  </h3>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="e.g. ₹45,000"
+                      value={quotePrice}
+                      onChange={(e) => setQuotePrice(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+              ) : selectedQuote.status === "quoted" || selectedQuote.status === "accepted" ? (
+                <div>
+                  <h3 className="text-sm font-medium text-slate-500 mb-2">
+                    Quoted Price
+                  </h3>
+                  <p className="text-lg font-bold text-blue-600">
+                    {(selectedQuote as any).quoted_price || "Price not recorded"}
+                  </p>
+                </div>
+              ) : null}
+
+              { }
               <div className="flex gap-3 pt-4 border-t border-slate-200">
-                <button className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
-                  Send Quote
+                <button
+                  onClick={handleSendQuote}
+                  disabled={isSending || selectedQuote.status === "quoted" || selectedQuote.status === "accepted"}
+                  className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isSending ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : selectedQuote.status === "quoted" || selectedQuote.status === "accepted" ? (
+                    "Quote Sent"
+                  ) : (
+                    "Send Quote"
+                  )}
+                </button>
+                <button
+                  onClick={() => updateQuoteStatus(selectedQuote.id, "accepted")}
+                  className="px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium disabled:opacity-50"
+                  disabled={selectedQuote.status === "accepted" || selectedQuote.status === "rejected"}
+                >
+                  Mark as Accepted
+                </button>
+                <button
+                  onClick={() => updateQuoteStatus(selectedQuote.id, "rejected")}
+                  className="px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium disabled:opacity-50"
+                  disabled={selectedQuote.status === "rejected" || selectedQuote.status === "accepted"}
+                >
+                  Reject
                 </button>
                 <a
                   href={`mailto:${selectedQuote.email}?subject=Re: Quote Request - ${selectedQuote.productName}`}
-                  className="px-4 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 font-medium"
+                  className="px-4 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 font-medium whitespace-nowrap"
                 >
                   Reply via Email
                 </a>
