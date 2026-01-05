@@ -4,14 +4,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Menu, X, MapPin, ChevronDown, ShoppingCart } from "lucide-react";
+import {
+  Search,
+  Menu,
+  X,
+  MapPin,
+  ChevronDown,
+  ShoppingCart,
+} from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { useCart } from "@/context/CartContext";
 import { useUI } from "@/context/UIContext";
-import SearchAutocomplete, { SearchAutocompleteRef } from "@/components/search/SearchAutocomplete";
+import SearchAutocomplete, {
+  SearchAutocompleteRef,
+} from "@/components/search/SearchAutocomplete";
 import VoiceSearch from "@/components/search/VoiceSearch";
 import { useRouter } from "next/navigation";
 
@@ -379,7 +388,9 @@ export default function Navbar() {
               </button>
               <div className="mt-4">
                 <h2 className="text-2xl font-black text-white">Menu</h2>
-                <p className="text-white/70 text-sm mt-1">Explore SPYAJ Marketing</p>
+                <p className="text-white/70 text-sm mt-1">
+                  Explore SPYAJ Marketing
+                </p>
               </div>
             </div>
 
@@ -398,7 +409,9 @@ export default function Navbar() {
               <div className="p-4 border-b border-border">
                 <div className="flex items-center gap-2 mb-2">
                   <MapPin className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Location</span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                    Location
+                  </span>
                 </div>
                 <div className="relative">
                   <select
@@ -419,7 +432,9 @@ export default function Navbar() {
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Menu className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Navigation</span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                    Navigation
+                  </span>
                 </div>
                 <div className="space-y-1">
                   {navLinks.map((link, idx) => (
@@ -436,10 +451,12 @@ export default function Navbar() {
                           "flex items-center justify-between py-3 px-4 rounded-xl transition-all",
                           pathname === link.href
                             ? "bg-primary/10 text-primary font-bold"
-                            : "text-foreground hover:bg-muted"
+                            : "text-foreground hover:bg-muted",
                         )}
                       >
-                        <span className="text-base font-semibold">{link.name}</span>
+                        <span className="text-base font-semibold">
+                          {link.name}
+                        </span>
                         <ChevronDown className="w-4 h-4 -rotate-90" />
                       </Link>
                     </motion.div>

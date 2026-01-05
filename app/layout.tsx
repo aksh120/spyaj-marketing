@@ -1,14 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import { ThemeProvider } from "@/components/theme-provider";
-import GlobalWidgets from "@/components/layout/GlobalWidgets";
 import { CartProvider } from "@/context/CartContext";
 import { UIProvider } from "@/context/UIContext";
-import CartDrawer from "@/components/layout/CartDrawer";
-import InstallPrompt from "@/components/pwa/InstallPrompt";
+import ConditionalLayout from "@/components/layout/ConditionalLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,12 +58,7 @@ export default function RootLayout({
         >
           <UIProvider>
             <CartProvider>
-              <Navbar />
-              <main className="flex-grow">{children}</main>
-              <Footer />
-              <GlobalWidgets />
-              <CartDrawer />
-              <InstallPrompt />
+              <ConditionalLayout>{children}</ConditionalLayout>
             </CartProvider>
           </UIProvider>
         </ThemeProvider>

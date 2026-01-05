@@ -32,14 +32,30 @@ import {
   TrendingUp,
   Sparkles,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { slugify } from "@/lib/utils";
 import { cn } from "@/lib/utils";
-import { discountProducts, flashDeals, featuredProducts } from "@/lib/data";
+import { supabase } from "@/lib/db";
 import RecentlyViewed from "@/components/product/RecentlyViewed";
+
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  price: string;
+  unit: string | null;
+  rating: number;
+  orders_count: number;
+  images: { url: string; alt?: string }[];
+  badge: string | null;
+  is_featured: boolean;
+  seller?: { name: string; slug: string; is_verified: boolean };
+  category?: { name: string; slug: string };
+}
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -202,8 +218,76 @@ export default function Home() {
     minutes: 32,
     seconds: 45,
   });
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const heroRef = useRef(null);
   const isHeroInView = useInView(heroRef, { once: true });
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select(
+            `
+            id, name, slug, price, unit, rating, orders_count, images, badge, is_featured,
+            seller:sellers(name, slug, is_verified),
+            category:categories(name, slug)
+          `,
+          )
+          .eq("is_active", true)
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching products:", error);
+          return;
+        }
+
+        if (data) {
+          const mappedProducts: Product[] = data.map(
+            (p: Record<string, unknown>) => ({
+              id: p.id as string,
+              name: p.name as string,
+              slug: p.slug as string,
+              price: p.price as string,
+              unit: p.unit as string | null,
+              rating: (p.rating as number) || 0,
+              orders_count: (p.orders_count as number) || 0,
+              images: (p.images as { url: string; alt?: string }[]) || [],
+              badge: p.badge as string | null,
+              is_featured: p.is_featured as boolean,
+              seller:
+                Array.isArray(p.seller) && p.seller.length > 0
+                  ? (p.seller[0] as {
+                      name: string;
+                      slug: string;
+                      is_verified: boolean;
+                    })
+                  : (p.seller as
+                      | { name: string; slug: string; is_verified: boolean }
+                      | undefined),
+              category:
+                Array.isArray(p.category) && p.category.length > 0
+                  ? (p.category[0] as { name: string; slug: string })
+                  : (p.category as { name: string; slug: string } | undefined),
+            }),
+          );
+
+          setAllProducts(mappedProducts);
+          setFeaturedProducts(
+            mappedProducts.filter((p) => p.is_featured).slice(0, 4),
+          );
+        }
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -464,17 +548,27 @@ export default function Home() {
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4"
-          >
-            {discountProducts.map((product) => (
-              <ProductCard key={product.id} product={product} showDiscount />
-            ))}
-          </motion.div>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-orange-600" />
+            </div>
+          ) : allProducts.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No products available yet.</p>
+            </div>
+          ) : (
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 md:gap-4"
+            >
+              {allProducts.slice(0, 4).map((product) => (
+                <FeaturedProductCard key={product.id} product={product} />
+              ))}
+            </motion.div>
+          )}
         </AnimatedSection>
 
         <AnimatedSection className="bg-gradient-to-r from-red-50 to-pink-100 dark:from-red-950/20 dark:to-pink-900/20 border-2 border-red-200 dark:border-red-800 rounded-xl md:rounded-2xl p-4 md:p-6">
@@ -508,22 +602,30 @@ export default function Home() {
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4"
-          >
-            {flashDeals.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                showDiscount
-                showStock
-              />
-            ))}
-          </motion.div>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-red-600" />
+            </div>
+          ) : allProducts.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No flash deals available yet.</p>
+            </div>
+          ) : (
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 md:gap-4"
+            >
+              {allProducts.slice(0, 4).map((product) => (
+                <FeaturedProductCard
+                  key={`flash-${product.id}`}
+                  product={product}
+                />
+              ))}
+            </motion.div>
+          )}
         </AnimatedSection>
 
         <AnimatedSection className="bg-card border-2 border-border rounded-xl md:rounded-2xl p-4 md:p-6 shadow-md">
@@ -547,17 +649,28 @@ export default function Home() {
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6"
-          >
-            {featuredProducts.map((product) => (
-              <FeaturedProductCard key={product.id} product={product} />
-            ))}
-          </motion.div>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : featuredProducts.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>No featured products yet. Add products in the admin panel.</p>
+            </div>
+          ) : (
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6"
+            >
+              {featuredProducts.map((product) => (
+                <FeaturedProductCard key={product.id} product={product} />
+              ))}
+            </motion.div>
+          )}
         </AnimatedSection>
 
         <AnimatedSection className="bg-card border-2 border-border rounded-xl md:rounded-2xl p-4 md:p-6 shadow-md">
@@ -579,22 +692,48 @@ export default function Home() {
               <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6"
-          >
-            {featuredProducts.map((product) => (
-              <FeaturedProductCard key={product.id} product={product} />
-            ))}
-          </motion.div>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : allProducts.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>No products available yet.</p>
+            </div>
+          ) : (
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6"
+            >
+              {allProducts.slice(0, 8).map((product) => (
+                <FeaturedProductCard key={product.id} product={product} />
+              ))}
+            </motion.div>
+          )}
         </AnimatedSection>
 
-        {categories.map((category, idx) => (
-          <CategoryCarousel key={idx} category={category} />
-        ))}
+        {categories.map((category, idx) => {
+          const filtered = allProducts.filter(
+            (p) => p.category?.name === category.name,
+          );
+
+          if (filtered.length === 0) return null;
+
+          return (
+            <CategoryCarousel
+              key={idx}
+              category={{
+                ...category,
+                count: `${filtered.length} products`,
+              }}
+              products={filtered}
+            />
+          );
+        })}
 
         <motion.section
           initial={{ opacity: 0, y: 30 }}
@@ -753,7 +892,23 @@ function ProductCard({
   );
 }
 
-function FeaturedProductCard({ product }: { product: any }) {
+function FeaturedProductCard({ product }: { product: Product }) {
+  const sellerName =
+    typeof product.seller === "object" && product.seller?.name
+      ? product.seller.name
+      : "Verified Seller";
+  const sellerSlug =
+    typeof product.seller === "object" && product.seller?.slug
+      ? product.seller.slug
+      : slugify(sellerName);
+  const isVerified =
+    typeof product.seller === "object" && product.seller?.is_verified;
+
+  const productImage =
+    product.images && product.images.length > 0
+      ? product.images[0].url
+      : "https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=500";
+
   return (
     <motion.div
       variants={staggerItem}
@@ -761,20 +916,23 @@ function FeaturedProductCard({ product }: { product: any }) {
       className="bg-background border-2 border-border rounded-lg md:rounded-xl overflow-hidden hover:border-primary/50 transition-all group cursor-pointer h-full relative"
     >
       <Link
-        href={`/product/${slugify(product.seller || "Verified Seller")}/${slugify(product.name)}`}
+        href={`/product/${sellerSlug}/${product.slug}`}
         className="block h-full w-full"
       >
         <div className="flex flex-col h-full">
           <div className="aspect-square bg-white flex items-center justify-center border-b-2 border-border relative overflow-hidden">
             <Image
-              src={
-                product.image || "https://loremflickr.com/500/500/industrial"
-              }
+              src={productImage}
               alt={product.name}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"
             />
             <motion.div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            {product.badge && (
+              <span className="absolute top-2 left-2 px-2 py-0.5 text-xs font-bold bg-primary text-white rounded">
+                {product.badge}
+              </span>
+            )}
           </div>
           <div className="p-3 md:p-4 flex-1">
             <div className="flex items-center gap-1.5 md:gap-2 mb-1.5 md:mb-2">
@@ -783,11 +941,11 @@ function FeaturedProductCard({ product }: { product: any }) {
                 transition={{ duration: 2, repeat: Infinity }}
                 className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-blue-500"
               />
-              <span className="text-[10px] md:text-xs font-bold text-blue-500 uppercase">
-                {product.seller}
+              <span className="text-[10px] md:text-xs font-bold text-blue-500 uppercase truncate">
+                {sellerName}
               </span>
-              {product.verified && (
-                <ShieldCheck className="w-3 h-3 text-green-500" />
+              {isVerified && (
+                <ShieldCheck className="w-3 h-3 text-green-500 flex-shrink-0" />
               )}
             </div>
             <h4 className="text-xs md:text-base font-bold mb-1.5 md:mb-2 group-hover:text-primary transition-colors line-clamp-2">
@@ -796,11 +954,16 @@ function FeaturedProductCard({ product }: { product: any }) {
             <div className="flex items-center gap-1 mb-2">
               <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
               <span className="text-[10px] text-muted-foreground">
-                {product.rating} • {product.orders} orders
+                {product.rating || 0} • {product.orders_count || 0} orders
               </span>
             </div>
             <p className="text-sm md:text-xl font-bold text-primary">
               {product.price}
+              {product.unit && (
+                <span className="text-xs font-normal text-muted-foreground">
+                  /{product.unit}
+                </span>
+              )}
             </p>
           </div>
         </div>
@@ -820,7 +983,13 @@ function FeaturedProductCard({ product }: { product: any }) {
   );
 }
 
-function CategoryCarousel({ category }: { category: any }) {
+function CategoryCarousel({
+  category,
+  products,
+}: {
+  category: any;
+  products: Product[];
+}) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
@@ -832,30 +1001,6 @@ function CategoryCarousel({ category }: { category: any }) {
       });
     }
   };
-
-  const seededRandom = (seed: number) => {
-    const x = Math.sin(seed) * 10000;
-    return x - Math.floor(x);
-  };
-
-  const products = Array(10)
-    .fill(null)
-    .map((_, i) => {
-      const seed = category.name.charCodeAt(0) + i;
-      const priceBase = seededRandom(seed * 123);
-      const ratingBase = seededRandom(seed * 456);
-      const soldBase = seededRandom(seed * 789);
-
-      return {
-        id: i,
-        name: `${category.name} Product ${i + 1}`,
-        price: `₹${500 + Math.floor(priceBase * 9500)}`,
-        seller: "Verified Seller",
-        image: `https://loremflickr.com/500/500/${category.name.toLowerCase().replace(/[^a-z]/g, "")}`,
-        rating: (4 + ratingBase * 1).toFixed(1),
-        sold: Math.floor(50 + soldBase * 500),
-      };
-    });
 
   return (
     <AnimatedSection className="bg-card border-2 border-border rounded-xl md:rounded-2xl p-4 md:p-6 shadow-md">
@@ -919,9 +1064,14 @@ function HorizontalProductCard({
   product,
   index,
 }: {
-  product: any;
+  product: Product;
   index: number;
 }) {
+  const sellerName = product.seller?.name || "Verified Seller";
+  const sellerSlug = product.seller?.slug || "verified-seller";
+  const productImage =
+    product.images && product.images.length > 0 ? product.images[0].url : "";
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -932,19 +1082,22 @@ function HorizontalProductCard({
       className="flex-shrink-0 w-[280px] md:w-[350px] bg-background border-2 border-border rounded-lg md:rounded-xl hover:border-primary/50 transition-all group cursor-pointer flex h-full relative"
     >
       <Link
-        href={`/product/${slugify(product.seller || "Verified Seller")}/${slugify(product.name)}`}
+        href={`/product/${sellerSlug}/${product.slug}`}
         className="flex gap-2.5 md:gap-3 w-full p-2.5 md:p-3"
       >
         <div className="w-16 h-16 md:w-24 md:h-24 bg-white rounded-lg flex items-center justify-center flex-shrink-0 relative overflow-hidden">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-cover"
-          />
-          <span className="text-muted-foreground/30 font-bold text-[10px] md:text-xs text-center sr-only">
-            {product.image}
-          </span>
+          {productImage ? (
+            <Image
+              src={productImage}
+              alt={product.name}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-muted">
+              <Package className="w-8 h-8 text-muted-foreground/30" />
+            </div>
+          )}
           <motion.div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
         <div className="flex-1 flex flex-col justify-between">
@@ -953,12 +1106,12 @@ function HorizontalProductCard({
               {product.name}
             </h4>
             <p className="text-[10px] md:text-xs text-muted-foreground mb-1">
-              {product.seller}
+              {sellerName}
             </p>
             <div className="flex items-center gap-1">
               <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
               <span className="text-[10px] text-muted-foreground">
-                {product.rating} • {product.sold} sold
+                {product.rating || 0} • {product.orders_count || 0} sold
               </span>
             </div>
           </div>

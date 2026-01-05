@@ -18,13 +18,38 @@ import {
   Eye,
   TrendingUp,
   Sparkles,
+  Loader2,
+  Package,
 } from "lucide-react";
 import { cn, slugify } from "@/lib/utils";
 import Image from "next/image";
 import { useRef } from "react";
 import Link from "next/link";
-import { products, allCategories as categories } from "@/lib/data";
+
+import { supabase } from "@/lib/db";
 import { useCart } from "@/context/CartContext";
+
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  price: string;
+  unit: string | null;
+  rating: number;
+  orders_count: number;
+  reviews_count: number;
+  images: { url: string; alt?: string }[];
+  badge: string | null;
+  is_featured: boolean;
+  category?: { id: string; name: string; slug: string };
+  seller?: { name: string; slug: string; is_verified: boolean };
+}
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -53,57 +78,136 @@ function MarketplaceContent() {
   const searchParams = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    const categorySlug = searchParams.get("category");
-    if (categorySlug) {
-      const foundCategory = categories.find((c) => slugify(c) === categorySlug);
-      if (foundCategory) setSelectedCategory(foundCategory);
-    }
-
-    const searchParam = searchParams.get("search");
-    if (searchParam) {
-      setSearchQuery(searchParam);
-    }
-  }, [searchParams]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("recommended");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [priceRange, setPriceRange] = useState([0, 100000]);
-  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
-  const [wishlist, setWishlist] = useState<number[]>([]);
+  const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
+  const [wishlist, setWishlist] = useState<string[]>([]);
   const [cartNotification, setCartNotification] = useState<string | null>(null);
   const router = useRouter();
   const { addToCart } = useCart();
   const containerRef = useRef(null);
   const isInView = useInView(containerRef, { once: true });
 
-  const toggleWishlist = (productId: number, e: React.MouseEvent) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data: productsData, error: productsError } = await supabase
+          .from("products")
+          .select(
+            `
+            id, name, slug, price, unit, rating, orders_count, reviews_count, images, badge, is_featured,
+            category:categories(id, name, slug),
+            seller:sellers(name, slug, is_verified)
+          `,
+          )
+          .eq("is_active", true)
+          .order("created_at", { ascending: false });
+
+        if (productsError) {
+          console.error("Error fetching products:", productsError);
+        } else if (productsData) {
+          const mapped = productsData.map((p: Record<string, unknown>) => ({
+            id: p.id as string,
+            name: p.name as string,
+            slug: p.slug as string,
+            price: p.price as string,
+            unit: p.unit as string | null,
+            rating: (p.rating as number) || 0,
+            orders_count: (p.orders_count as number) || 0,
+            reviews_count: (p.reviews_count as number) || 0,
+            images: (p.images as { url: string; alt?: string }[]) || [],
+            badge: p.badge as string | null,
+            is_featured: p.is_featured as boolean,
+            category:
+              Array.isArray(p.category) && p.category.length > 0
+                ? (p.category[0] as { id: string; name: string; slug: string })
+                : (p.category as
+                    | { id: string; name: string; slug: string }
+                    | undefined),
+            seller:
+              Array.isArray(p.seller) && p.seller.length > 0
+                ? (p.seller[0] as {
+                    name: string;
+                    slug: string;
+                    is_verified: boolean;
+                  })
+                : (p.seller as
+                    | { name: string; slug: string; is_verified: boolean }
+                    | undefined),
+          }));
+          setProducts(mapped);
+        }
+
+        const { data: catData, error: catError } = await supabase
+          .from("categories")
+          .select("id, name, slug")
+          .eq("is_active", true)
+          .order("name");
+
+        if (catError) {
+          console.error("Error fetching categories:", catError);
+        } else if (catData) {
+          setCategories(catData);
+        }
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const categorySlug = searchParams.get("category");
+    if (categorySlug && categories.length > 0) {
+      const foundCategory = categories.find((c) => c.slug === categorySlug);
+      if (foundCategory) setSelectedCategory(foundCategory.name);
+    }
+
+    const searchParam = searchParams.get("search");
+    if (searchParam) {
+      setSearchQuery(searchParam);
+    }
+  }, [searchParams, categories]);
+
+  const toggleWishlist = (productId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setWishlist((prev) =>
       prev.includes(productId)
         ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
+        : [...prev, productId],
     );
   };
 
-  const handleQuickView = (product: any, e: React.MouseEvent) => {
+  const handleQuickView = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    router.push(`/product/${slugify(product.seller || "Verified Seller")}/${slugify(product.name)}`);
+    const sellerSlug =
+      product.seller?.slug ||
+      slugify(product.seller?.name || "verified-seller");
+    router.push(`/product/${sellerSlug}/${product.slug}`);
   };
 
-  const handleAddToCart = (product: any, e: React.MouseEvent) => {
+  const handleAddToCart = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    const productImage =
+      product.images && product.images.length > 0 ? product.images[0].url : "";
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.image,
-      seller: product.seller || "Verified Seller",
-      category: product.category,
+      image: productImage,
+      seller: product.seller?.name || "Verified Seller",
+      category: product.category?.name || "",
     });
     setCartNotification(`${product.name} added to cart!`);
     setTimeout(() => setCartNotification(null), 3000);
@@ -112,10 +216,7 @@ function MarketplaceContent() {
   const filteredProducts = products
     .filter(
       (p) =>
-        selectedCategory === "All" ||
-        p.category === selectedCategory ||
-        p.category.includes(selectedCategory) ||
-        selectedCategory.includes(p.category),
+        selectedCategory === "All" || p.category?.name === selectedCategory,
     )
     .filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
@@ -130,7 +231,7 @@ function MarketplaceContent() {
           parseInt(a.price.replace(/[^\d]/g, ""))
         );
       if (sortBy === "rating") return b.rating - a.rating;
-      if (sortBy === "orders") return b.orders - a.orders;
+      if (sortBy === "orders") return b.orders_count - a.orders_count;
       return 0;
     });
 
@@ -241,19 +342,36 @@ function MarketplaceContent() {
                     <Grid className="w-4 h-4 text-primary" /> Categories
                   </h4>
                   <div className="space-y-1">
+                    <button
+                      key="all"
+                      onClick={() => setSelectedCategory("All")}
+                      className={cn(
+                        "w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all flex items-center justify-between",
+                        selectedCategory === "All"
+                          ? "bg-primary text-primary-foreground font-semibold"
+                          : "hover:bg-muted bg-muted/30",
+                      )}
+                    >
+                      All Categories
+                      {selectedCategory === "All" && (
+                        <CheckCircle2 className="w-4 h-4" />
+                      )}
+                    </button>
                     {categories.map((cat) => (
                       <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat.name)}
                         className={cn(
                           "w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all flex items-center justify-between",
-                          selectedCategory === cat
+                          selectedCategory === cat.name
                             ? "bg-primary text-primary-foreground font-semibold"
-                            : "hover:bg-muted bg-muted/30"
+                            : "hover:bg-muted bg-muted/30",
                         )}
                       >
-                        {cat}
-                        {selectedCategory === cat && <CheckCircle2 className="w-4 h-4" />}
+                        {cat.name}
+                        {selectedCategory === cat.name && (
+                          <CheckCircle2 className="w-4 h-4" />
+                        )}
                       </button>
                     ))}
                   </div>
@@ -261,7 +379,8 @@ function MarketplaceContent() {
 
                 <div>
                   <h4 className="font-bold mb-3 text-sm flex items-center gap-2">
-                    <SlidersHorizontal className="w-4 h-4 text-primary" /> Price Range
+                    <SlidersHorizontal className="w-4 h-4 text-primary" /> Price
+                    Range
                   </h4>
                   <div className="px-1 space-y-4">
                     <input
@@ -269,7 +388,9 @@ function MarketplaceContent() {
                       min="0"
                       max="100000"
                       value={priceRange[1]}
-                      onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
+                      onChange={(e) =>
+                        setPriceRange([0, parseInt(e.target.value)])
+                      }
                       className="w-full accent-primary h-2 bg-muted rounded-lg appearance-none cursor-pointer"
                     />
                     <div className="flex items-center justify-between text-sm font-medium bg-muted/50 p-2 rounded-lg border border-border">
@@ -305,23 +426,44 @@ function MarketplaceContent() {
               <Filter className="w-4 h-4 text-primary" /> Categories
             </h3>
             <div className="space-y-1">
+              <motion.button
+                key="all"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0 }}
+                whileHover={{ x: 5 }}
+                onClick={() => setSelectedCategory("All")}
+                className={cn(
+                  "w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all flex items-center justify-between group",
+                  selectedCategory === "All"
+                    ? "bg-primary text-primary-foreground font-semibold"
+                    : "hover:bg-muted",
+                )}
+              >
+                All Categories
+                {selectedCategory === "All" && (
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                    <CheckCircle2 className="w-4 h-4" />
+                  </motion.div>
+                )}
+              </motion.button>
               {categories.map((cat, idx) => (
                 <motion.button
-                  key={cat}
+                  key={cat.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.05 }}
+                  transition={{ delay: (idx + 1) * 0.05 }}
                   whileHover={{ x: 5 }}
-                  onClick={() => setSelectedCategory(cat)}
+                  onClick={() => setSelectedCategory(cat.name)}
                   className={cn(
                     "w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all flex items-center justify-between group",
-                    selectedCategory === cat
+                    selectedCategory === cat.name
                       ? "bg-primary text-primary-foreground font-semibold"
                       : "hover:bg-muted",
                   )}
                 >
-                  {cat}
-                  {selectedCategory === cat && (
+                  {cat.name}
+                  {selectedCategory === cat.name && (
                     <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
                       <CheckCircle2 className="w-4 h-4" />
                     </motion.div>
@@ -468,28 +610,27 @@ function MarketplaceContent() {
                   className={cn(
                     "group bg-background border-2 border-border rounded-xl md:rounded-2xl overflow-hidden transition-all duration-300 relative",
                     hoveredProduct === product.id &&
-                    "border-primary/50 shadow-xl shadow-primary/10",
+                      "border-primary/50 shadow-xl shadow-primary/10",
                   )}
                 >
                   <Link
-                    href={`/product/${slugify(product.seller || "Verified Seller")}/${slugify(product.name)}`}
+                    href={`/product/${product.seller?.slug || "verified-seller"}/${product.slug}`}
                     className="absolute inset-0 z-0"
                   />
                   <div className="aspect-square bg-gradient-to-br from-primary/5 via-muted/30 to-primary/10 relative overflow-hidden border-b-2 border-border pointer-events-none">
                     <div className="absolute inset-0 flex items-center justify-center bg-white">
-                      {product.image.startsWith("http") ? (
+                      {product.images &&
+                      product.images.length > 0 &&
+                      product.images[0].url.startsWith("http") ? (
                         <Image
-                          src={
-                            product.image ||
-                            "https://loremflickr.com/500/500/industrial"
-                          }
+                          src={product.images[0].url}
                           alt={product.name}
                           fill
                           className="object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                       ) : (
                         <div className="text-muted-foreground/30 italic font-semibold text-xs md:text-base">
-                          {product.image}
+                          📦
                         </div>
                       )}
                     </div>
@@ -501,14 +642,14 @@ function MarketplaceContent() {
                         className={cn(
                           "absolute top-2 md:top-3 left-2 md:left-3 px-2 py-0.5 md:py-1 rounded-md text-[8px] md:text-[10px] font-bold shadow-lg uppercase tracking-wider",
                           product.badge === "Best Seller" &&
-                          "bg-orange-500 text-white",
+                            "bg-orange-500 text-white",
                           product.badge === "Top Rated" &&
-                          "bg-yellow-500 text-black",
+                            "bg-yellow-500 text-black",
                           product.badge === "Trending" &&
-                          "bg-pink-500 text-white",
+                            "bg-pink-500 text-white",
                           product.badge === "New" && "bg-green-500 text-white",
                           product.badge === "Popular" &&
-                          "bg-blue-500 text-white",
+                            "bg-blue-500 text-white",
                         )}
                       >
                         {product.badge}
@@ -516,7 +657,7 @@ function MarketplaceContent() {
                     )}
 
                     <div className="absolute top-2 md:top-3 right-2 md:right-3 bg-primary text-primary-foreground px-1.5 py-0.5 md:px-3 md:py-1.5 rounded-md md:rounded-lg text-[8px] md:text-[10px] font-bold shadow-lg uppercase tracking-wider">
-                      {product.category}
+                      {product.category?.name || "Product"}
                     </div>
 
                     <motion.div
@@ -544,16 +685,22 @@ function MarketplaceContent() {
                             "p-2 rounded-full shadow-lg transition-colors",
                             wishlist.includes(product.id)
                               ? "bg-red-500 hover:bg-red-600"
-                              : "bg-white hover:bg-gray-100"
+                              : "bg-white hover:bg-gray-100",
                           )}
-                          title={wishlist.includes(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
-                        >
-                          <Heart className={cn(
-                            "w-4 h-4",
+                          title={
                             wishlist.includes(product.id)
-                              ? "text-white fill-white"
-                              : "text-gray-700"
-                          )} />
+                              ? "Remove from Wishlist"
+                              : "Add to Wishlist"
+                          }
+                        >
+                          <Heart
+                            className={cn(
+                              "w-4 h-4",
+                              wishlist.includes(product.id)
+                                ? "text-white fill-white"
+                                : "text-gray-700",
+                            )}
+                          />
                         </motion.button>
                         <motion.button
                           whileHover={{ scale: 1.1 }}
@@ -577,7 +724,7 @@ function MarketplaceContent() {
                         <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-blue-500" />
                       </motion.div>
                       <span className="text-[9px] md:text-[11px] font-semibold text-blue-500 uppercase tracking-wider truncate">
-                        {product.seller}
+                        {product.seller?.name || "Verified Seller"}
                       </span>
                     </div>
 
@@ -600,13 +747,13 @@ function MarketplaceContent() {
                         ))}
                       </div>
                       <span className="text-[10px] md:text-xs text-muted-foreground">
-                        {product.rating} ({product.reviews})
+                        {product.rating} ({product.reviews_count || 0})
                       </span>
                     </div>
 
                     <div className="text-[10px] md:text-xs text-muted-foreground mb-2 md:mb-4">
                       <span className="font-semibold text-foreground">
-                        {product.orders.toLocaleString("en-IN")}
+                        {(product.orders_count || 0).toLocaleString("en-IN")}
                       </span>{" "}
                       orders
                     </div>
@@ -617,7 +764,7 @@ function MarketplaceContent() {
                           {product.price}
                         </span>
                         <span className="text-[8px] md:text-xs text-muted-foreground ml-1">
-                          / Unit
+                          {product.unit ? `/ ${product.unit}` : "/ Unit"}
                         </span>
                       </div>
                     </div>

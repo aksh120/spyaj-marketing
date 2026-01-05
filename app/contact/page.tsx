@@ -69,15 +69,11 @@ export default function Contact() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [rateLimitError, setRateLimitError] = useState<string | null>(null);
 
-  // Security: Client-side rate limiting for form submissions
-  // Allows 10 submissions per minute to prevent spam
   const rateLimit = useClientRateLimit({
     key: "contact-form",
     config: RateLimitPresets.form,
   });
 
-  // Security: Form validation with sanitization
-  // All inputs are validated against predefined schemas and sanitized
   const form = useFormValidation({
     initialValues: {
       name: "",
@@ -93,21 +89,35 @@ export default function Contact() {
     },
     validateOnBlur: true,
     onSubmit: async (sanitizedData) => {
-      // Security: Check rate limit before submission
       if (!rateLimit.checkAndConsume()) {
         setRateLimitError(
-          `Too many submissions. Please try again in ${rateLimit.timeUntilReset}.`
+          `Too many submissions. Please try again in ${rateLimit.timeUntilReset}.`,
         );
         return;
       }
       setRateLimitError(null);
 
-      // Simulate API call (in production, this would send sanitized data to backend)
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: sanitizedData.name,
+          email: sanitizedData.email,
+          subject: sanitizedData.subject,
+          message: sanitizedData.message,
+        }),
+      });
 
-      // Log sanitized data in development
-      if (process.env.NODE_ENV === "development") {
-        console.log("Sanitized form data:", sanitizedData);
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          setRateLimitError("Too many submissions. Please try again later.");
+          return;
+        }
+        throw new Error(result.error || "Failed to submit form");
       }
 
       setIsSubmitted(true);
@@ -317,7 +327,7 @@ export default function Contact() {
                   </p>
                 </div>
 
-                {/* Security: Rate limit error display */}
+                {}
                 {rateLimitError && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
@@ -348,10 +358,11 @@ export default function Contact() {
                       value={form.values.name}
                       onChange={form.handleChange}
                       onBlur={form.handleBlur}
-                      className={`w-full bg-background border-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${form.errors.name ? "border-red-500" : "border-border"
-                        }`}
+                      className={`w-full bg-background border-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${
+                        form.errors.name ? "border-red-500" : "border-border"
+                      }`}
                     />
-                    {/* Security: Field validation error display */}
+                    {}
                     {form.errors.name && (
                       <p className="text-xs text-red-500 mt-1">
                         {form.errors.name[0]}
@@ -376,8 +387,9 @@ export default function Contact() {
                       value={form.values.email}
                       onChange={form.handleChange}
                       onBlur={form.handleBlur}
-                      className={`w-full bg-background border-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${form.errors.email ? "border-red-500" : "border-border"
-                        }`}
+                      className={`w-full bg-background border-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${
+                        form.errors.email ? "border-red-500" : "border-border"
+                      }`}
                     />
                     {form.errors.email && (
                       <p className="text-xs text-red-500 mt-1">
@@ -428,15 +440,16 @@ export default function Contact() {
                     value={form.values.message}
                     onChange={form.handleChange}
                     onBlur={form.handleBlur}
-                    className={`w-full bg-background border-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none ${form.errors.message ? "border-red-500" : "border-border"
-                      }`}
+                    className={`w-full bg-background border-2 px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none ${
+                      form.errors.message ? "border-red-500" : "border-border"
+                    }`}
                   ></textarea>
                   {form.errors.message && (
                     <p className="text-xs text-red-500 mt-1">
                       {form.errors.message[0]}
                     </p>
                   )}
-                  {/* Security: Character count for message */}
+                  {}
                   <p className="text-xs text-muted-foreground text-right">
                     {form.values.message.length}/5000
                   </p>
@@ -448,7 +461,9 @@ export default function Contact() {
                     boxShadow: "0 20px 40px rgba(var(--primary)/0.3)",
                   }}
                   whileTap={{ scale: 0.98 }}
-                  disabled={form.isSubmitting || form.hasErrors || rateLimit.isLimited}
+                  disabled={
+                    form.isSubmitting || form.hasErrors || rateLimit.isLimited
+                  }
                   className="w-full bg-primary text-primary-foreground py-3 md:py-4 rounded-lg md:rounded-xl text-sm md:text-base font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary/20"
                 >
                   {form.isSubmitting ? (

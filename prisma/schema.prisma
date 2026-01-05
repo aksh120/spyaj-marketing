@@ -1,0 +1,240 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model AdminUser {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique @db.VarChar(255)
+  passwordHash String    @map("password_hash") @db.VarChar(255)
+  name         String    @db.VarChar(100)
+  role         String    @default("admin") @db.VarChar(20)
+  isActive     Boolean   @default(true) @map("is_active")
+  lastLogin    DateTime? @map("last_login") @db.Timestamptz
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  sessions          AdminSession[]
+  auditLogs         AuditLog[]
+  assignedContacts  ContactSubmission[] @relation("AssignedContacts")
+  assignedQuotes    QuoteRequest[]      @relation("AssignedQuotes")
+  updatedContent    SiteContent[]       @relation("ContentUpdater")
+
+  @@map("admin_users")
+}
+
+model AdminSession {
+  id           String   @id @default(uuid()) @db.Uuid
+  sessionToken String   @unique @map("session_token") @db.VarChar(255)
+  userId       String   @map("user_id") @db.Uuid
+  expires      DateTime @db.Timestamptz
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("admin_sessions")
+}
+
+model Category {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String   @db.VarChar(100)
+  slug         String   @unique @db.VarChar(100)
+  description  String?  @db.Text
+  imageUrl     String?  @map("image_url") @db.VarChar(500)
+  parentId     String?  @map("parent_id") @db.Uuid
+  displayOrder Int      @default(0) @map("display_order")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+  products Product[]
+
+  @@map("categories")
+}
+
+model Seller {
+  id              String   @id @default(uuid()) @db.Uuid
+  slug            String   @unique @db.VarChar(100)
+  name            String   @db.VarChar(200)
+  description     String?  @db.Text
+  tier            String   @default("Bronze") @db.VarChar(20)
+  isVerified      Boolean  @default(false) @map("is_verified")
+  rating          Decimal  @default(0) @db.Decimal(2, 1)
+  responseRate    String?  @map("response_rate") @db.VarChar(10)
+  responseTime    String?  @map("response_time") @db.VarChar(50)
+  deliverySuccess String?  @map("delivery_success") @db.VarChar(10)
+  location        String?  @db.VarChar(200)
+  joinedYear      Int?     @map("joined_year")
+  logoUrl         String?  @map("logo_url") @db.VarChar(500)
+  bannerUrl       String?  @map("banner_url") @db.VarChar(500)
+  certifications  String[] @default([])
+  contactEmail    String?  @map("contact_email") @db.VarChar(255)
+  contactPhone    String?  @map("contact_phone") @db.VarChar(20)
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  products Product[]
+
+  @@map("sellers")
+}
+
+model Product {
+  id               String   @id @default(uuid()) @db.Uuid
+  name             String   @db.VarChar(300)
+  slug             String   @unique @db.VarChar(300)
+  description      String?  @db.Text
+  shortDescription String?  @map("short_description") @db.VarChar(500)
+  price            String   @db.VarChar(50)
+  priceNumeric     Decimal? @map("price_numeric") @db.Decimal(15, 2)
+  currency         String   @default("INR") @db.VarChar(10)
+  unit             String?  @db.VarChar(50)
+  minOrderQty      Int      @default(1) @map("min_order_qty")
+  categoryId       String?  @map("category_id") @db.Uuid
+  sellerId         String?  @map("seller_id") @db.Uuid
+  images           Json     @default("[]")
+  rating           Decimal  @default(0) @db.Decimal(2, 1)
+  reviewsCount     Int      @default(0) @map("reviews_count")
+  ordersCount      Int      @default(0) @map("orders_count")
+  viewsCount       Int      @default(0) @map("views_count")
+  badge            String?  @db.VarChar(50)
+  isFeatured       Boolean  @default(false) @map("is_featured")
+  isActive         Boolean  @default(true) @map("is_active")
+  metaTitle        String?  @map("meta_title") @db.VarChar(200)
+  metaDescription  String?  @map("meta_description") @db.VarChar(500)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  category      Category?      @relation(fields: [categoryId], references: [id])
+  seller        Seller?        @relation(fields: [sellerId], references: [id])
+  quoteRequests QuoteRequest[]
+
+  @@index([categoryId])
+  @@index([sellerId])
+  @@index([slug])
+  @@map("products")
+}
+
+model ContactSubmission {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @db.VarChar(100)
+  email       String    @db.VarChar(255)
+  phone       String?   @db.VarChar(20)
+  company     String?   @db.VarChar(200)
+  subject     String?   @db.VarChar(100)
+  message     String    @db.Text
+  status      String    @default("new") @db.VarChar(20)
+  assignedTo  String?   @map("assigned_to") @db.Uuid
+  adminNotes  String?   @map("admin_notes") @db.Text
+  ipAddress   String?   @map("ip_address") @db.VarChar(45)
+  userAgent   String?   @map("user_agent") @db.Text
+  referrer    String?   @db.VarChar(500)
+  emailSent   Boolean   @default(false) @map("email_sent")
+  emailSentAt DateTime? @map("email_sent_at") @db.Timestamptz
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  assignedAdmin AdminUser? @relation("AssignedContacts", fields: [assignedTo], references: [id])
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("contact_submissions")
+}
+
+model QuoteRequest {
+  id               String    @id @default(uuid()) @db.Uuid
+  contactName      String    @map("contact_name") @db.VarChar(100)
+  companyName      String?   @map("company_name") @db.VarChar(200)
+  email            String    @db.VarChar(255)
+  phone            String?   @db.VarChar(20)
+  productName      String    @map("product_name") @db.VarChar(300)
+  category         String?   @db.VarChar(100)
+  quantity         String?   @db.VarChar(100)
+  targetBudget     String?   @map("target_budget") @db.VarChar(100)
+  requirements     String?   @db.Text
+  deliveryLocation String?   @map("delivery_location") @db.VarChar(200)
+  attachments      Json      @default("[]")
+  productId        String?   @map("product_id") @db.Uuid
+  status           String    @default("open") @db.VarChar(20)
+  assignedTo       String?   @map("assigned_to") @db.Uuid
+  adminNotes       String?   @map("admin_notes") @db.Text
+  quotedPrice      String?   @map("quoted_price") @db.VarChar(100)
+  quotedAt         DateTime? @map("quoted_at") @db.Timestamptz
+  quoteValidUntil  DateTime? @map("quote_valid_until") @db.Timestamptz
+  ipAddress        String?   @map("ip_address") @db.VarChar(45)
+  userAgent        String?   @map("user_agent") @db.Text
+  source           String?   @db.VarChar(50)
+  emailSent        Boolean   @default(false) @map("email_sent")
+  emailSentAt      DateTime? @map("email_sent_at") @db.Timestamptz
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  product       Product?   @relation(fields: [productId], references: [id])
+  assignedAdmin AdminUser? @relation("AssignedQuotes", fields: [assignedTo], references: [id])
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("quote_requests")
+}
+
+model SiteContent {
+  id          String   @id @default(uuid()) @db.Uuid
+  key         String   @unique @db.VarChar(100)
+  contentType String   @default("text") @map("content_type") @db.VarChar(20)
+  value       String   @db.Text
+  page        String?  @db.VarChar(100)
+  section     String?  @db.VarChar(100)
+  description String?  @db.VarChar(500)
+  updatedBy   String?  @map("updated_by") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  updater AdminUser? @relation("ContentUpdater", fields: [updatedBy], references: [id])
+
+  @@map("site_content")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  adminId    String?  @map("admin_id") @db.Uuid
+  adminEmail String?  @map("admin_email") @db.VarChar(255)
+  action     String   @db.VarChar(50)
+  entityType String?  @map("entity_type") @db.VarChar(50)
+  entityId   String?  @map("entity_id") @db.Uuid
+  oldValues  Json?    @map("old_values")
+  newValues  Json?    @map("new_values")
+  ipAddress  String?  @map("ip_address") @db.VarChar(45)
+  userAgent  String?  @map("user_agent") @db.Text
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  admin AdminUser? @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@index([entityType, entityId])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+
+model EmailLog {
+  id                String   @id @default(uuid()) @db.Uuid
+  recipientEmail    String   @map("recipient_email") @db.VarChar(255)
+  subject           String   @db.VarChar(500)
+  template          String?  @db.VarChar(100)
+  status            String   @default("sent") @db.VarChar(20)
+  relatedEntityType String?  @map("related_entity_type") @db.VarChar(50)
+  relatedEntityId   String?  @map("related_entity_id") @db.Uuid
+  errorMessage      String?  @map("error_message") @db.Text
+  smtpResponse      String?  @map("smtp_response") @db.Text
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+  @@map("email_logs")
+}
