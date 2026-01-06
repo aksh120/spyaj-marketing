@@ -444,7 +444,7 @@ export const RateLimitPresets: Record<string, RateLimitConfig> = {
 
   auth: {
     windowMs: 15 * 60 * 1000,
-    maxRequests: 5,
+    maxRequests: 50,
     message: "Too many authentication attempts. Please try again later.",
   },
 

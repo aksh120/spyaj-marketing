@@ -49,11 +49,13 @@ const contentTypeColors = {
 
 const pageIcons: Record<string, typeof Globe> = {
   global: Globe,
+  home: Globe,
   landing: Globe,
   about: FileText,
   contact: Phone,
   social: Share2,
   seo: Settings,
+  seller: Settings,
 };
 
 const defaultContentItems: Omit<SiteContent, "id">[] = [
@@ -502,6 +504,713 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
     section: "trust",
     description: "Trade guarantee text",
   },
+  // New Home Page - Hero Section
+  {
+    key: "home_hero_badge",
+    content_type: "text",
+    value: "Next-Gen B2B Sourcing",
+    page: "home",
+    section: "hero",
+    description: "Hero section badge text (appears above the title)",
+  },
+  {
+    key: "home_hero_title",
+    content_type: "text",
+    value: "The Future of Global Trade",
+    page: "home",
+    section: "hero",
+    description: "Main hero title",
+  },
+  {
+    key: "home_hero_subtitle",
+    content_type: "text",
+    value: "Connect with 10,000+ verified factories. Experience AI-powered sourcing, real-time tracking, and bank-grade security.",
+    page: "home",
+    section: "hero",
+    description: "Hero section description paragraph",
+  },
+  {
+    key: "home_hero_cta_primary",
+    content_type: "text",
+    value: "Find Suppliers",
+    page: "home",
+    section: "hero",
+    description: "Primary CTA button text in hero",
+  },
+  {
+    key: "home_hero_cta_secondary",
+    content_type: "text",
+    value: "Get Custom Quote",
+    page: "home",
+    section: "hero",
+    description: "Secondary CTA button text in hero",
+  },
+  // Trust Bar Features
+  {
+    key: "home_trust_feature_1_title",
+    content_type: "text",
+    value: "Verified Suppliers",
+    page: "home",
+    section: "trust",
+    description: "Trust bar feature 1 main text",
+  },
+  {
+    key: "home_trust_feature_1_desc",
+    content_type: "text",
+    value: "100% Authenticated",
+    page: "home",
+    section: "trust",
+    description: "Trust bar feature 1 description",
+  },
+  {
+    key: "home_trust_feature_2_title",
+    content_type: "text",
+    value: "Secure Payments",
+    page: "home",
+    section: "trust",
+    description: "Trust bar feature 2 main text",
+  },
+  {
+    key: "home_trust_feature_2_desc",
+    content_type: "text",
+    value: "Escrow Protected",
+    page: "home",
+    section: "trust",
+    description: "Trust bar feature 2 description",
+  },
+  {
+    key: "home_trust_feature_3_title",
+    content_type: "text",
+    value: "Trade Assurance",
+    page: "home",
+    section: "trust",
+    description: "Trust bar feature 3 main text",
+  },
+  {
+    key: "home_trust_feature_3_desc",
+    content_type: "text",
+    value: "On-time Delivery",
+    page: "home",
+    section: "trust",
+    description: "Trust bar feature 3 description",
+  },
+  {
+    key: "home_trust_feature_4_title",
+    content_type: "text",
+    value: "24/7 Support",
+    page: "home",
+    section: "trust",
+    description: "Trust bar feature 4 main text",
+  },
+  {
+    key: "home_trust_feature_4_desc",
+    content_type: "text",
+    value: "Dedicated Team",
+    page: "home",
+    section: "trust",
+    description: "Trust bar feature 4 description",
+  },
+  // How It Works Section
+  {
+    key: "home_hiw_title",
+    content_type: "text",
+    value: "How It Works",
+    page: "home",
+    section: "how_it_works",
+    description: "Section title for How It Works",
+  },
+  {
+    key: "home_hiw_subtitle",
+    content_type: "text",
+    value: "Your journey from search to success in 4 simple steps",
+    page: "home",
+    section: "how_it_works",
+    description: "Subtitle for How It Works section",
+  },
+  {
+    key: "home_hiw_step_1_title",
+    content_type: "text",
+    value: "Search Products",
+    page: "home",
+    section: "how_it_works",
+    description: "Step 1 title",
+  },
+  {
+    key: "home_hiw_step_1_desc",
+    content_type: "text",
+    value: "Browse 500K+ products from verified suppliers",
+    page: "home",
+    section: "how_it_works",
+    description: "Step 1 description",
+  },
+  {
+    key: "home_hiw_step_2_title",
+    content_type: "text",
+    value: "Connect with Suppliers",
+    page: "home",
+    section: "how_it_works",
+    description: "Step 2 title",
+  },
+  {
+    key: "home_hiw_step_2_desc",
+    content_type: "text",
+    value: "Get instant quotes and negotiate directly",
+    page: "home",
+    section: "how_it_works",
+    description: "Step 2 description",
+  },
+  {
+    key: "home_hiw_step_3_title",
+    content_type: "text",
+    value: "Place Bulk Orders",
+    page: "home",
+    section: "how_it_works",
+    description: "Step 3 title",
+  },
+  {
+    key: "home_hiw_step_3_desc",
+    content_type: "text",
+    value: "Secure transactions with trade assurance",
+    page: "home",
+    section: "how_it_works",
+    description: "Step 3 description",
+  },
+  {
+    key: "home_hiw_step_4_title",
+    content_type: "text",
+    value: "Receive & Grow",
+    page: "home",
+    section: "how_it_works",
+    description: "Step 4 title",
+  },
+  {
+    key: "home_hiw_step_4_desc",
+    content_type: "text",
+    value: "Reliable delivery with quality guarantee",
+    page: "home",
+    section: "how_it_works",
+    description: "Step 4 description",
+  },
+  // Stats Section
+  {
+    key: "home_stats_suppliers_value",
+    content_type: "text",
+    value: "10000",
+    page: "home",
+    section: "stats",
+    description: "Number of verified suppliers (raw number)",
+  },
+  {
+    key: "home_stats_suppliers_suffix",
+    content_type: "text",
+    value: "+",
+    page: "home",
+    section: "stats",
+    description: "Suppliers stat suffix (e.g. +)",
+  },
+  {
+    key: "home_stats_suppliers_label",
+    content_type: "text",
+    value: "Verified Suppliers",
+    page: "home",
+    section: "stats",
+    description: "Suppliers stat label",
+  },
+  {
+    key: "home_stats_products_value",
+    content_type: "text",
+    value: "500000",
+    page: "home",
+    section: "stats",
+    description: "Number of products listed (raw number)",
+  },
+  {
+    key: "home_stats_products_suffix",
+    content_type: "text",
+    value: "+",
+    page: "home",
+    section: "stats",
+    description: "Products stat suffix",
+  },
+  {
+    key: "home_stats_products_label",
+    content_type: "text",
+    value: "Products Listed",
+    page: "home",
+    section: "stats",
+    description: "Products stat label",
+  },
+  {
+    key: "home_stats_buyers_value",
+    content_type: "text",
+    value: "50000",
+    page: "home",
+    section: "stats",
+    description: "Number of active buyers (raw number)",
+  },
+  {
+    key: "home_stats_buyers_suffix",
+    content_type: "text",
+    value: "+",
+    page: "home",
+    section: "stats",
+    description: "Buyers stat suffix",
+  },
+  {
+    key: "home_stats_buyers_label",
+    content_type: "text",
+    value: "Active Buyers",
+    page: "home",
+    section: "stats",
+    description: "Buyers stat label",
+  },
+  {
+    key: "home_stats_orders_value",
+    content_type: "text",
+    value: "2",
+    page: "home",
+    section: "stats",
+    description: "Orders fulfilled (raw number before suffix)",
+  },
+  {
+    key: "home_stats_orders_suffix",
+    content_type: "text",
+    value: "M+",
+    page: "home",
+    section: "stats",
+    description: "Orders stat suffix (e.g. M+)",
+  },
+  {
+    key: "home_stats_orders_label",
+    content_type: "text",
+    value: "Orders Fulfilled",
+    page: "home",
+    section: "stats",
+    description: "Orders stat label",
+  },
+  // Testimonials Section
+  {
+    key: "home_testimonials_title",
+    content_type: "text",
+    value: "Trusted by Thousands",
+    page: "home",
+    section: "testimonials",
+    description: "Testimonials section title",
+  },
+  {
+    key: "home_testimonials_subtitle",
+    content_type: "text",
+    value: "See what our customers are saying about their SPYAJ experience",
+    page: "home",
+    section: "testimonials",
+    description: "Testimonials section subtitle",
+  },
+  {
+    key: "home_testimonial_1_name",
+    content_type: "text",
+    value: "Rajesh Sharma",
+    page: "home",
+    section: "testimonials",
+    description: "Testimonial 1 - Person name",
+  },
+  {
+    key: "home_testimonial_1_role",
+    content_type: "text",
+    value: "Procurement Head, Tata Industries",
+    page: "home",
+    section: "testimonials",
+    description: "Testimonial 1 - Role and company",
+  },
+  {
+    key: "home_testimonial_1_quote",
+    content_type: "text",
+    value: "SPYAJ revolutionized our procurement process. We reduced costs by 30% while maintaining quality standards.",
+    page: "home",
+    section: "testimonials",
+    description: "Testimonial 1 - Quote text",
+  },
+  {
+    key: "home_testimonial_2_name",
+    content_type: "text",
+    value: "Priya Patel",
+    page: "home",
+    section: "testimonials",
+    description: "Testimonial 2 - Person name",
+  },
+  {
+    key: "home_testimonial_2_role",
+    content_type: "text",
+    value: "Supply Chain Manager, Reliance Retail",
+    page: "home",
+    section: "testimonials",
+    description: "Testimonial 2 - Role and company",
+  },
+  {
+    key: "home_testimonial_2_quote",
+    content_type: "text",
+    value: "The verified supplier network gave us confidence in every transaction. Outstanding platform for B2B trade.",
+    page: "home",
+    section: "testimonials",
+    description: "Testimonial 2 - Quote text",
+  },
+  {
+    key: "home_testimonial_3_name",
+    content_type: "text",
+    value: "Amit Kumar",
+    page: "home",
+    section: "testimonials",
+    description: "Testimonial 3 - Person name",
+  },
+  {
+    key: "home_testimonial_3_role",
+    content_type: "text",
+    value: "Director, Mahindra Exports",
+    page: "home",
+    section: "testimonials",
+    description: "Testimonial 3 - Role and company",
+  },
+  {
+    key: "home_testimonial_3_quote",
+    content_type: "text",
+    value: "From finding suppliers to closing deals, SPYAJ made international sourcing seamless and secure.",
+    page: "home",
+    section: "testimonials",
+    description: "Testimonial 3 - Quote text",
+  },
+  // FAQ Section
+  {
+    key: "home_faq_title",
+    content_type: "text",
+    value: "Frequently Asked Questions",
+    page: "home",
+    section: "faq",
+    description: "FAQ section title",
+  },
+  {
+    key: "home_faq_subtitle",
+    content_type: "text",
+    value: "Everything you need to know about SPYAJ",
+    page: "home",
+    section: "faq",
+    description: "FAQ section subtitle",
+  },
+  {
+    key: "home_faq_1_q",
+    content_type: "text",
+    value: "What is the minimum order quantity (MOQ)?",
+    page: "home",
+    section: "faq",
+    description: "FAQ 1 - Question",
+  },
+  {
+    key: "home_faq_1_a",
+    content_type: "text",
+    value: "MOQ varies by supplier and product. Most suppliers offer flexible MOQs starting from as low as 10 units for samples and 100+ units for bulk orders.",
+    page: "home",
+    section: "faq",
+    description: "FAQ 1 - Answer",
+  },
+  {
+    key: "home_faq_2_q",
+    content_type: "text",
+    value: "How do I verify supplier authenticity?",
+    page: "home",
+    section: "faq",
+    description: "FAQ 2 - Question",
+  },
+  {
+    key: "home_faq_2_a",
+    content_type: "text",
+    value: "All suppliers undergo KYC verification, factory audits, and receive badges based on their verification level (Gold, Silver, Bronze). Look for the verified badge on supplier profiles.",
+    page: "home",
+    section: "faq",
+    description: "FAQ 2 - Answer",
+  },
+  {
+    key: "home_faq_3_q",
+    content_type: "text",
+    value: "What payment methods are accepted?",
+    page: "home",
+    section: "faq",
+    description: "FAQ 3 - Question",
+  },
+  {
+    key: "home_faq_3_a",
+    content_type: "text",
+    value: "We support bank transfers, credit/debit cards, UPI, and escrow payments. Trade Assurance protects your payment until order delivery.",
+    page: "home",
+    section: "faq",
+    description: "FAQ 3 - Answer",
+  },
+  {
+    key: "home_faq_4_q",
+    content_type: "text",
+    value: "How long does shipping take?",
+    page: "home",
+    section: "faq",
+    description: "FAQ 4 - Question",
+  },
+  {
+    key: "home_faq_4_a",
+    content_type: "text",
+    value: "Domestic orders typically take 3-7 business days. International shipping varies by destination (7-21 days). Express options available.",
+    page: "home",
+    section: "faq",
+    description: "FAQ 4 - Answer",
+  },
+  {
+    key: "home_faq_5_q",
+    content_type: "text",
+    value: "Can I request product samples?",
+    page: "home",
+    section: "faq",
+    description: "FAQ 5 - Question",
+  },
+  {
+    key: "home_faq_5_a",
+    content_type: "text",
+    value: "Yes! Most suppliers offer sample orders. Use the 'Request Sample' button on product pages to get samples before bulk ordering.",
+    page: "home",
+    section: "faq",
+    description: "FAQ 5 - Answer",
+  },
+  // Newsletter Section
+  {
+    key: "home_newsletter_title",
+    content_type: "text",
+    value: "Stay Updated",
+    page: "home",
+    section: "newsletter",
+    description: "Newsletter section title",
+  },
+  {
+    key: "home_newsletter_subtitle",
+    content_type: "text",
+    value: "Get the latest industry news, exclusive deals, and sourcing tips delivered to your inbox.",
+    page: "home",
+    section: "newsletter",
+    description: "Newsletter section description",
+  },
+  {
+    key: "home_newsletter_button",
+    content_type: "text",
+    value: "Subscribe",
+    page: "home",
+    section: "newsletter",
+    description: "Newsletter submit button text",
+  },
+  {
+    key: "home_newsletter_placeholder",
+    content_type: "text",
+    value: "Enter your email",
+    page: "home",
+    section: "newsletter",
+    description: "Newsletter input placeholder text",
+  },
+  // CTA Section
+  {
+    key: "home_cta_title",
+    content_type: "text",
+    value: "Ready to Transform Your Business Sourcing?",
+    page: "home",
+    section: "cta",
+    description: "Final CTA section title",
+  },
+  {
+    key: "home_cta_subtitle",
+    content_type: "text",
+    value: "Join thousands of businesses sourcing smarter with SPYAJ. Start your journey today.",
+    page: "home",
+    section: "cta",
+    description: "Final CTA section subtitle",
+  },
+  {
+    key: "home_cta_button_primary",
+    content_type: "text",
+    value: "Get Started Free",
+    page: "home",
+    section: "cta",
+    description: "Primary CTA button text",
+  },
+  {
+    key: "home_cta_button_secondary",
+    content_type: "text",
+    value: "Schedule a Demo",
+    page: "home",
+    section: "cta",
+    description: "Secondary CTA button text",
+  },
+  // Buyer Benefits Section
+  {
+    key: "home_benefits_title",
+    content_type: "text",
+    value: "Why Buyers Choose SPYAJ",
+    page: "home",
+    section: "benefits",
+    description: "Buyer benefits section title",
+  },
+  {
+    key: "home_benefits_subtitle",
+    content_type: "text",
+    value: "Everything you need for smart B2B sourcing under one platform",
+    page: "home",
+    section: "benefits",
+    description: "Buyer benefits section subtitle",
+  },
+  {
+    key: "home_benefit_1_title",
+    content_type: "text",
+    value: "Bulk Pricing",
+    page: "home",
+    section: "benefits",
+    description: "Benefit 1 title",
+  },
+  {
+    key: "home_benefit_1_desc",
+    content_type: "text",
+    value: "Get wholesale rates directly from manufacturers",
+    page: "home",
+    section: "benefits",
+    description: "Benefit 1 description",
+  },
+  {
+    key: "home_benefit_2_title",
+    content_type: "text",
+    value: "Trade Protection",
+    page: "home",
+    section: "benefits",
+    description: "Benefit 2 title",
+  },
+  {
+    key: "home_benefit_2_desc",
+    content_type: "text",
+    value: "100% money-back guarantee on every order",
+    page: "home",
+    section: "benefits",
+    description: "Benefit 2 description",
+  },
+  {
+    key: "home_benefit_3_title",
+    content_type: "text",
+    value: "Fast Quotes",
+    page: "home",
+    section: "benefits",
+    description: "Benefit 3 title",
+  },
+  {
+    key: "home_benefit_3_desc",
+    content_type: "text",
+    value: "Receive multiple quotes within 24 hours",
+    page: "home",
+    section: "benefits",
+    description: "Benefit 3 description",
+  },
+  {
+    key: "home_benefit_4_title",
+    content_type: "text",
+    value: "Quality Assured",
+    page: "home",
+    section: "benefits",
+    description: "Benefit 4 title",
+  },
+  {
+    key: "home_benefit_4_desc",
+    content_type: "text",
+    value: "Pre-shipment inspection on bulk orders",
+    page: "home",
+    section: "benefits",
+    description: "Benefit 4 description",
+  },
+  {
+    key: "home_benefit_5_title",
+    content_type: "text",
+    value: "Easy Returns",
+    page: "home",
+    section: "benefits",
+    description: "Benefit 5 title",
+  },
+  {
+    key: "home_benefit_5_desc",
+    content_type: "text",
+    value: "Hassle-free returns for defective products",
+    page: "home",
+    section: "benefits",
+    description: "Benefit 5 description",
+  },
+  {
+    key: "home_benefit_6_title",
+    content_type: "text",
+    value: "Credit Terms",
+    page: "home",
+    section: "benefits",
+    description: "Benefit 6 title",
+  },
+  {
+    key: "home_benefit_6_desc",
+    content_type: "text",
+    value: "Flexible payment terms for trusted buyers",
+    page: "home",
+    section: "benefits",
+    description: "Benefit 6 description",
+  },
+  // Industries Section
+  {
+    key: "home_industries_title",
+    content_type: "text",
+    value: "Explore Industries",
+    page: "home",
+    section: "industries",
+    description: "Industries section title",
+  },
+  {
+    key: "home_industries_subtitle",
+    content_type: "text",
+    value: "Find verified suppliers across 50+ industries. From raw materials to finished goods.",
+    page: "home",
+    section: "industries",
+    description: "Industries section subtitle",
+  },
+  {
+    key: "home_industries_badge",
+    content_type: "text",
+    value: "50+ Industries",
+    page: "home",
+    section: "industries",
+    description: "Industries section badge text",
+  },
+  // RFQ Section on Home
+  {
+    key: "home_rfq_title",
+    content_type: "text",
+    value: "Get Custom Quotes in 24 Hours",
+    page: "home",
+    section: "rfq",
+    description: "RFQ section title on homepage",
+  },
+  {
+    key: "home_rfq_subtitle",
+    content_type: "text",
+    value: "Tell us what you need. Our network of 10,000+ suppliers will compete to offer you the best prices.",
+    page: "home",
+    section: "rfq",
+    description: "RFQ section subtitle on homepage",
+  },
+  {
+    key: "home_rfq_form_title",
+    content_type: "text",
+    value: "Request for Quote",
+    page: "home",
+    section: "rfq",
+    description: "RFQ form title on homepage",
+  },
+  {
+    key: "home_rfq_button",
+    content_type: "text",
+    value: "Get Free Quotes",
+    page: "home",
+    section: "rfq",
+    description: "RFQ submit button text on homepage",
+  },
 ];
 
 type ContentType = "text" | "html" | "image" | "json";
@@ -681,7 +1390,7 @@ export default function AdminContentPage() {
 
   return (
     <div className="space-y-6">
-      {}
+      { }
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Site Content</h1>
@@ -711,7 +1420,7 @@ export default function AdminContentPage() {
         </div>
       </div>
 
-      {}
+      { }
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
         {Object.entries(groupedContent).map(([page, items]) => (
           <div
@@ -726,7 +1435,7 @@ export default function AdminContentPage() {
         ))}
       </div>
 
-      {}
+      { }
       <div className="bg-white rounded-xl border border-slate-200 p-4">
         <div className="relative">
           <Search
@@ -743,7 +1452,7 @@ export default function AdminContentPage() {
         </div>
       </div>
 
-      {}
+      { }
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
@@ -764,7 +1473,7 @@ export default function AdminContentPage() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-xl border border-slate-200 overflow-hidden"
           >
-            {}
+            { }
             <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <h2 className="font-semibold text-slate-900">
                 {pageLabels[page] || page}
@@ -774,7 +1483,7 @@ export default function AdminContentPage() {
               </span>
             </div>
 
-            {}
+            { }
             <div className="divide-y divide-slate-100">
               {items
                 .filter(
@@ -798,7 +1507,7 @@ export default function AdminContentPage() {
                   return (
                     <div key={item.id} className="p-4 sm:p-5">
                       <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                        {}
+                        { }
                         <div className="sm:w-56 flex-shrink-0">
                           <div className="flex items-center gap-2 mb-1">
                             <span
@@ -820,7 +1529,7 @@ export default function AdminContentPage() {
                           )}
                         </div>
 
-                        {}
+                        { }
                         <div className="flex-1">
                           {item.content_type === "html" ? (
                             <textarea
@@ -862,15 +1571,14 @@ export default function AdminContentPage() {
                           )}
                         </div>
 
-                        {}
+                        { }
                         <button
                           onClick={() => handleSave(item)}
                           disabled={!hasChanges || saving === item.id}
-                          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors flex-shrink-0 ${
-                            hasChanges
-                              ? "bg-blue-600 text-white hover:bg-blue-700"
-                              : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                          }`}
+                          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors flex-shrink-0 ${hasChanges
+                            ? "bg-blue-600 text-white hover:bg-blue-700"
+                            : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                            }`}
                         >
                           {saving === item.id ? (
                             <Loader2 size={16} className="animate-spin" />
@@ -896,7 +1604,7 @@ export default function AdminContentPage() {
         ))
       )}
 
-      {}
+      { }
       <AnimatePresence>
         {showAddModal && (
           <>

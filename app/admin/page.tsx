@@ -84,12 +84,28 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [{ count: products }, { count: categories }, { count: sellers }, { count: newContacts }, { count: openQuotes }, { data: recentQuotes }, { data: recentContacts }] = await Promise.all([
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      const oneWeekAgoIso = oneWeekAgo.toISOString();
+
+      const [
+        { count: products },
+        { count: categories },
+        { count: sellers },
+        { count: newContacts },
+        { count: openQuotes },
+        { count: quotesThisWeekCount },
+        { count: contactsThisWeekCount },
+        { data: recentQuotes },
+        { data: recentContacts }
+      ] = await Promise.all([
         supabaseAdmin.from("products").select("*", { count: "exact", head: true }),
         supabaseAdmin.from("categories").select("*", { count: "exact", head: true }),
         supabaseAdmin.from("sellers").select("*", { count: "exact", head: true }),
         supabaseAdmin.from("contact_submissions").select("*", { count: "exact", head: true }).eq("status", "new"),
         supabaseAdmin.from("quote_requests").select("*", { count: "exact", head: true }).eq("status", "open"),
+        supabaseAdmin.from("quote_requests").select("*", { count: "exact", head: true }).gt("created_at", oneWeekAgoIso),
+        supabaseAdmin.from("contact_submissions").select("*", { count: "exact", head: true }).gt("created_at", oneWeekAgoIso),
         supabaseAdmin.from("quote_requests").select("id, product_name, contact_name, status, created_at").order("created_at", { ascending: false }).limit(5),
         supabaseAdmin.from("contact_submissions").select("id, name, subject, status, created_at").order("created_at", { ascending: false }).limit(5),
       ]);
@@ -100,8 +116,8 @@ export default function AdminDashboard() {
         totalSellers: sellers || 0,
         newContacts: newContacts || 0,
         openQuotes: openQuotes || 0,
-        quotesThisWeek: 0,
-        contactsThisWeek: 0,
+        quotesThisWeek: quotesThisWeekCount || 0,
+        contactsThisWeek: contactsThisWeekCount || 0,
       });
 
       const activity: RecentActivity[] = [
@@ -218,36 +234,40 @@ export default function AdminDashboard() {
             This Week
           </h3>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <FileText className="w-5 h-5 text-blue-600" />
-                <span className="text-sm font-medium text-blue-600">
-                  Quote Requests
-                </span>
+            <Link href="/admin/quotes" className="block">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer border border-blue-200/50">
+                <div className="flex items-center gap-2 mb-2">
+                  <FileText className="w-5 h-5 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-600">
+                    Quote Requests
+                  </span>
+                </div>
+                <p className="text-3xl font-bold text-blue-900">
+                  {stats?.quotesThisWeek ?? 0}
+                </p>
+                <div className="flex items-center gap-1 mt-2 text-xs text-blue-600">
+                  <ArrowUpRight className="w-3 h-3" />
+                  <span>New this week</span>
+                </div>
               </div>
-              <p className="text-3xl font-bold text-blue-900">
-                {stats?.quotesThisWeek ?? 0}
-              </p>
-              <div className="flex items-center gap-1 mt-2 text-xs text-blue-600">
-                <ArrowUpRight className="w-3 h-3" />
-                <span>New this week</span>
+            </Link>
+            <Link href="/admin/leads" className="block">
+              <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer border border-emerald-200/50">
+                <div className="flex items-center gap-2 mb-2">
+                  <MessageSquare className="w-5 h-5 text-emerald-600" />
+                  <span className="text-sm font-medium text-emerald-600">
+                    Contact Messages
+                  </span>
+                </div>
+                <p className="text-3xl font-bold text-emerald-900">
+                  {stats?.contactsThisWeek ?? 0}
+                </p>
+                <div className="flex items-center gap-1 mt-2 text-xs text-emerald-600">
+                  <ArrowUpRight className="w-3 h-3" />
+                  <span>New this week</span>
+                </div>
               </div>
-            </div>
-            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <MessageSquare className="w-5 h-5 text-emerald-600" />
-                <span className="text-sm font-medium text-emerald-600">
-                  Contact Messages
-                </span>
-              </div>
-              <p className="text-3xl font-bold text-emerald-900">
-                {stats?.contactsThisWeek ?? 0}
-              </p>
-              <div className="flex items-center gap-1 mt-2 text-xs text-emerald-600">
-                <ArrowUpRight className="w-3 h-3" />
-                <span>New this week</span>
-              </div>
-            </div>
+            </Link>
           </div>
         </div>
 
