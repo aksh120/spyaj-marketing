@@ -434,25 +434,42 @@ const partnerLogos = [
   "Godrej",
 ];
 
+import useSiteContent from "@/hooks/useSiteContent";
+import React, { createContext, useContext } from "react";
+
+const SiteContentContext = createContext<{
+  get: (key: string, fallback?: string) => string;
+  content: Record<string, string>;
+}>({
+  get: () => "",
+  content: {},
+});
+
+export const useSiteContentContext = () => useContext(SiteContentContext);
+
 export default function LandingPage2() {
+  const { content, get, loading } = useSiteContent("home");
+
   return (
-    <main className="min-h-screen pt-[80px] md:pt-[100px] bg-background overflow-hidden">
-      <HeroSection />
-      <TrustBar />
-      <LiveTradeFeed />
-      <IndustriesSection />
-      <VerificationTiersSection />
-      <HowItWorksSection />
-      <BuyerBenefitsSection />
-      <StatsSection />
-      <FeaturedSuppliersSection />
-      <RFQSection />
-      <TestimonialsSection />
-      <PartnerLogosSection />
-      <FAQSection />
-      <NewsletterSection />
-      <CTASection />
-    </main>
+    <SiteContentContext.Provider value={{ get, content }}>
+      <main className="min-h-screen pt-[80px] md:pt-[100px] bg-background overflow-hidden">
+        <HeroSection />
+        <TrustBar />
+        <LiveTradeFeed />
+        <IndustriesSection />
+        <VerificationTiersSection />
+        <HowItWorksSection />
+        <BuyerBenefitsSection />
+        <StatsSection />
+        <FeaturedSuppliersSection />
+        <RFQSection />
+        <TestimonialsSection />
+        <PartnerLogosSection />
+        <FAQSection />
+        <NewsletterSection />
+        <CTASection />
+      </main>
+    </SiteContentContext.Provider>
   );
 }
 
@@ -460,6 +477,7 @@ function HeroSection() {
   const ref = useRef(null);
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { get } = useSiteContentContext();
 
   useEffect(() => {
     setMounted(true);
@@ -547,7 +565,7 @@ function HeroSection() {
                 className="text-sm font-medium tracking-wide"
                 style={{ color: isDark ? "rgba(255,255,255,0.9)" : "#374151" }}
               >
-                Next-Gen B2B Sourcing
+                {get("home_hero_badge", "Next-Gen B2B Sourcing")}
               </span>
             </motion.div>
 
@@ -555,11 +573,18 @@ function HeroSection() {
               className="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6 tracking-tight"
               style={{ color: isDark ? "#ffffff" : "#111827" }}
             >
-              The Future of <br />
+              {get("home_hero_title", "The Future of Global Trade")
+                .split(" ")
+                .slice(0, 3)
+                .join(" ")}{" "}
+              <br />
               <span
                 className={`text-transparent bg-clip-text bg-gradient-to-r ${isDark ? "from-blue-400 via-cyan-400 to-blue-400" : "from-blue-600 via-indigo-600 to-blue-600"} animate-gradient-x bg-[length:200%_auto]`}
               >
-                Global Trade
+                {get("home_hero_title", "The Future of Global Trade")
+                  .split(" ")
+                  .slice(3)
+                  .join(" ") || "Global Trade"}
               </span>
             </h1>
 
@@ -567,8 +592,10 @@ function HeroSection() {
               className="text-lg md:text-xl mb-10 max-w-xl leading-relaxed"
               style={{ color: isDark ? "rgba(191,219,254,0.7)" : "#4b5563" }}
             >
-              Connect with 10,000+ verified factories. Experience AI-powered
-              sourcing, real-time tracking, and bank-grade security.
+              {get(
+                "home_hero_subtitle",
+                "Connect with 10,000+ verified factories. Experience AI-powered sourcing, real-time tracking, and bank-grade security.",
+              )}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-5">
@@ -589,7 +616,7 @@ function HeroSection() {
                 >
                   <span className="relative flex items-center gap-2">
                     <Search className="w-5 h-5" />
-                    Find Suppliers
+                    {get("home_hero_cta_primary", "Find Suppliers")}
                   </span>
                 </Link>
               </motion.div>
@@ -609,7 +636,9 @@ function HeroSection() {
                     borderColor: isDark ? "rgba(255,255,255,0.1)" : "#e5e7eb",
                   }}
                 >
-                  <span>Get Custom Quote</span>
+                  <span>
+                    {get("home_hero_cta_secondary", "Get Custom Quote")}
+                  </span>
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </motion.div>
@@ -1010,12 +1039,36 @@ function DeprecatedHeroSection() {
 function TrustBar() {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { get } = useSiteContentContext();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
+
+  const dynamicTrustFeatures = [
+    {
+      icon: <ShieldCheck className="w-5 h-5" />,
+      text: get("home_trust_feature_1_title", "Verified Suppliers"),
+      desc: get("home_trust_feature_1_desc", "100% Authenticated"),
+    },
+    {
+      icon: <CreditCard className="w-5 h-5" />,
+      text: get("home_trust_feature_2_title", "Secure Payments"),
+      desc: get("home_trust_feature_2_desc", "Escrow Protected"),
+    },
+    {
+      icon: <Truck className="w-5 h-5" />,
+      text: get("home_trust_feature_3_title", "Trade Assurance"),
+      desc: get("home_trust_feature_3_desc", "On-time Delivery"),
+    },
+    {
+      icon: <Headphones className="w-5 h-5" />,
+      text: get("home_trust_feature_4_title", "24/7 Support"),
+      desc: get("home_trust_feature_4_desc", "Dedicated Team"),
+    },
+  ];
 
   return (
     <motion.section
@@ -1035,7 +1088,7 @@ function TrustBar() {
 
       <div className="max-w-[1400px] mx-auto px-4 md:px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {trustFeatures.map((feature, i) => (
+          {dynamicTrustFeatures.map((feature, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
@@ -1337,12 +1390,52 @@ function HowItWorksSection() {
   const isInView = useInView(ref, { once: true });
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { get } = useSiteContentContext();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
+
+  const dynamicHowItWorks = [
+    {
+      step: 1,
+      title: get("home_hiw_step_1_title", "Search Products"),
+      desc: get(
+        "home_hiw_step_1_desc",
+        "Browse 500K+ products from verified suppliers",
+      ),
+      icon: <Search className="w-8 h-8" />,
+    },
+    {
+      step: 2,
+      title: get("home_hiw_step_2_title", "Connect with Suppliers"),
+      desc: get(
+        "home_hiw_step_2_desc",
+        "Get instant quotes and negotiate directly",
+      ),
+      icon: <MessageSquare className="w-8 h-8" />,
+    },
+    {
+      step: 3,
+      title: get("home_hiw_step_3_title", "Place Bulk Orders"),
+      desc: get(
+        "home_hiw_step_3_desc",
+        "Secure transactions with trade assurance",
+      ),
+      icon: <Handshake className="w-8 h-8" />,
+    },
+    {
+      step: 4,
+      title: get("home_hiw_step_4_title", "Receive & Grow"),
+      desc: get(
+        "home_hiw_step_4_desc",
+        "Reliable delivery with quality guarantee",
+      ),
+      icon: <Package className="w-8 h-8" />,
+    },
+  ];
 
   return (
     <section
@@ -1427,7 +1520,7 @@ function HowItWorksSection() {
             />
           </div>
 
-          {howItWorks.map((step, i) => (
+          {dynamicHowItWorks.map((step, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 40 }}
@@ -2111,12 +2204,36 @@ function StatsSection() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { get } = useSiteContentContext();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const isDark = mounted && resolvedTheme === "dark";
+
+  const dynamicStats = [
+    {
+      value: parseInt(get("home_stats_suppliers_value", "10000")) || 10000,
+      suffix: get("home_stats_suppliers_suffix", "+"),
+      label: get("home_stats_suppliers_label", "Verified Suppliers"),
+    },
+    {
+      value: parseInt(get("home_stats_products_value", "500000")) || 500000,
+      suffix: get("home_stats_products_suffix", "+"),
+      label: get("home_stats_products_label", "Products Listed"),
+    },
+    {
+      value: parseInt(get("home_stats_buyers_value", "50000")) || 50000,
+      suffix: get("home_stats_buyers_suffix", "+"),
+      label: get("home_stats_buyers_label", "Active Buyers"),
+    },
+    {
+      value: parseInt(get("home_stats_orders_value", "2")) || 2,
+      suffix: get("home_stats_orders_suffix", "M+"),
+      label: get("home_stats_orders_label", "Orders Fulfilled"),
+    },
+  ];
 
   return (
     <section
@@ -2176,7 +2293,7 @@ function StatsSection() {
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {stats.map((stat, i) => (
+          {dynamicStats.map((stat, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 40, scale: 0.9 }}
@@ -2587,6 +2704,8 @@ function FAQSection() {
 }
 
 function CTASection() {
+  const { get } = useSiteContentContext();
+
   return (
     <section
       className="py-24 md:py-32 relative overflow-hidden"
@@ -2640,16 +2759,27 @@ function CTASection() {
           </motion.span>
 
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
-            Ready to Transform
+            {get("home_cta_title", "Ready to Transform Your Business Sourcing?")
+              .split(" ")
+              .slice(0, 3)
+              .join(" ")}
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 animate-gradient-x">
-              Your Business?
+              {get(
+                "home_cta_title",
+                "Ready to Transform Your Business Sourcing?",
+              )
+                .split(" ")
+                .slice(3)
+                .join(" ") || "Your Business?"}
             </span>
           </h2>
 
           <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-            Join 50,000+ businesses already sourcing smarter with SPYAJ. Start
-            with a free account today.
+            {get(
+              "home_cta_subtitle",
+              "Join thousands of businesses sourcing smarter with SPYAJ. Start your journey today.",
+            )}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-5 justify-center">
@@ -2667,7 +2797,7 @@ function CTASection() {
                   boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
                 }}
               >
-                Start Sourcing Free
+                {get("home_cta_button_primary", "Get Started Free")}
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </motion.div>
@@ -2686,7 +2816,7 @@ function CTASection() {
                 }}
               >
                 <Phone className="w-5 h-5" />
-                Talk to Sales
+                {get("home_cta_button_secondary", "Schedule a Demo")}
               </Link>
             </motion.div>
           </div>

@@ -97,17 +97,43 @@ export default function AdminDashboard() {
         { count: quotesThisWeekCount },
         { count: contactsThisWeekCount },
         { data: recentQuotes },
-        { data: recentContacts }
+        { data: recentContacts },
       ] = await Promise.all([
-        supabaseAdmin.from("products").select("*", { count: "exact", head: true }),
-        supabaseAdmin.from("categories").select("*", { count: "exact", head: true }),
-        supabaseAdmin.from("sellers").select("*", { count: "exact", head: true }),
-        supabaseAdmin.from("contact_submissions").select("*", { count: "exact", head: true }).eq("status", "new"),
-        supabaseAdmin.from("quote_requests").select("*", { count: "exact", head: true }).eq("status", "open"),
-        supabaseAdmin.from("quote_requests").select("*", { count: "exact", head: true }).gt("created_at", oneWeekAgoIso),
-        supabaseAdmin.from("contact_submissions").select("*", { count: "exact", head: true }).gt("created_at", oneWeekAgoIso),
-        supabaseAdmin.from("quote_requests").select("id, product_name, contact_name, status, created_at").order("created_at", { ascending: false }).limit(5),
-        supabaseAdmin.from("contact_submissions").select("id, name, subject, status, created_at").order("created_at", { ascending: false }).limit(5),
+        supabaseAdmin
+          .from("products")
+          .select("*", { count: "exact", head: true }),
+        supabaseAdmin
+          .from("categories")
+          .select("*", { count: "exact", head: true }),
+        supabaseAdmin
+          .from("sellers")
+          .select("*", { count: "exact", head: true }),
+        supabaseAdmin
+          .from("contact_submissions")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "new"),
+        supabaseAdmin
+          .from("quote_requests")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "open"),
+        supabaseAdmin
+          .from("quote_requests")
+          .select("*", { count: "exact", head: true })
+          .gt("created_at", oneWeekAgoIso),
+        supabaseAdmin
+          .from("contact_submissions")
+          .select("*", { count: "exact", head: true })
+          .gt("created_at", oneWeekAgoIso),
+        supabaseAdmin
+          .from("quote_requests")
+          .select("id, product_name, contact_name, status, created_at")
+          .order("created_at", { ascending: false })
+          .limit(5),
+        supabaseAdmin
+          .from("contact_submissions")
+          .select("id, name, subject, status, created_at")
+          .order("created_at", { ascending: false })
+          .limit(5),
       ]);
 
       setStats({
@@ -121,7 +147,7 @@ export default function AdminDashboard() {
       });
 
       const activity: RecentActivity[] = [
-        ...(recentQuotes?.map(q => ({
+        ...(recentQuotes?.map((q) => ({
           type: "quote" as const,
           id: q.id,
           title: q.product_name,
@@ -129,7 +155,7 @@ export default function AdminDashboard() {
           status: q.status,
           createdAt: q.created_at,
         })) || []),
-        ...(recentContacts?.map(c => ({
+        ...(recentContacts?.map((c) => ({
           type: "contact" as const,
           id: c.id,
           title: c.name,
@@ -137,7 +163,12 @@ export default function AdminDashboard() {
           status: c.status,
           createdAt: c.created_at,
         })) || []),
-      ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
+      ]
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )
+        .slice(0, 5);
 
       setRecentActivity(activity);
     } catch (error) {
@@ -167,7 +198,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      { }
+      {}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
@@ -187,7 +218,7 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      { }
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {statCards.map((card, index) => (
           <motion.div
@@ -198,10 +229,11 @@ export default function AdminDashboard() {
           >
             <Link href={card.href}>
               <div
-                className={`bg-white rounded-xl p-5 border ${card.highlight && stats?.[card.key]
-                  ? "border-orange-200 shadow-lg shadow-orange-100"
-                  : "border-slate-200"
-                  } hover:shadow-lg transition-shadow cursor-pointer`}
+                className={`bg-white rounded-xl p-5 border ${
+                  card.highlight && stats?.[card.key]
+                    ? "border-orange-200 shadow-lg shadow-orange-100"
+                    : "border-slate-200"
+                } hover:shadow-lg transition-shadow cursor-pointer`}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div
@@ -226,9 +258,9 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      { }
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        { }
+        {}
         <div className="bg-white rounded-xl border border-slate-200 p-6">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">
             This Week
@@ -271,7 +303,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        { }
+        {}
         <div className="bg-white rounded-xl border border-slate-200 p-6">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">
             Recent Activity
@@ -292,10 +324,11 @@ export default function AdminDashboard() {
                   className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg"
                 >
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${activity.type === "quote"
-                      ? "bg-orange-100 text-orange-600"
-                      : "bg-blue-100 text-blue-600"
-                      }`}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      activity.type === "quote"
+                        ? "bg-orange-100 text-orange-600"
+                        : "bg-blue-100 text-blue-600"
+                    }`}
                   >
                     {activity.type === "quote" ? (
                       <FileText className="w-4 h-4" />
@@ -312,10 +345,11 @@ export default function AdminDashboard() {
                     </p>
                   </div>
                   <span
-                    className={`text-xs px-2 py-1 rounded-full ${activity.status === "new" || activity.status === "open"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : "bg-slate-100 text-slate-600"
-                      }`}
+                    className={`text-xs px-2 py-1 rounded-full ${
+                      activity.status === "new" || activity.status === "open"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-slate-100 text-slate-600"
+                    }`}
                   >
                     {activity.status}
                   </span>
@@ -326,7 +360,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      { }
+      {}
       <div className="bg-white rounded-xl border border-slate-200 p-6">
         <h3 className="text-lg font-semibold text-slate-900 mb-4">
           Quick Actions

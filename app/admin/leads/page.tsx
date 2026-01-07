@@ -96,7 +96,9 @@ export default function AdminLeadsPage() {
         prev.map((c) => (c.id === id ? { ...c, status: newStatus } : c)),
       );
       if (selectedContact?.id === id) {
-        setSelectedContact((prev) => (prev ? { ...prev, status: newStatus } : null));
+        setSelectedContact((prev) =>
+          prev ? { ...prev, status: newStatus } : null,
+        );
       }
     } catch (error) {
       console.error("Failed to update status:", error);
@@ -105,7 +107,8 @@ export default function AdminLeadsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this message?")) return;
+    if (!window.confirm("Are you sure you want to delete this message?"))
+      return;
 
     try {
       const { error } = await supabaseAdmin
@@ -147,7 +150,7 @@ export default function AdminLeadsPage() {
 
   return (
     <div className="space-y-6">
-      { }
+      {}
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Contact Messages</h1>
         <p className="text-slate-500">
@@ -155,38 +158,10 @@ export default function AdminLeadsPage() {
         </p>
       </div>
 
-      { }
-      {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {["new", "read", "replied", "resolved"].map((status) => (
-          <button
-            key={status}
-            onClick={() => setStatusFilter(status)}
-            className={`p-4 rounded-xl border ${statusFilter === status
-                ? "border-blue-500 bg-blue-50"
-                : "border-slate-200 bg-white hover:bg-slate-50"
-              } transition-colors`}
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <div
-                className={`${statusColors[status].bg} ${statusColors[status].text} p-1.5 rounded`}
-              >
-                {status === "new" && <AlertCircle className="w-4 h-4" />}
-                {status === "read" && <Eye className="w-4 h-4" />}
-                {status === "replied" && <Reply className="w-4 h-4" />}
-                {status === "resolved" && <CheckCircle className="w-4 h-4" />}
-              </div>
-              <span className="text-sm font-medium text-slate-600 capitalize">
-                {status}
-              </span>
-            </div>
-            <p className="text-2xl font-bold text-slate-900">
-              {contacts.filter((c) => c.status === status).length}
-            </p>
-          </button>
-        ))}
-      </div> */}
+      {}
+      {}
 
-      { }
+      {}
       <div className="bg-white rounded-xl border border-slate-200 p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
@@ -209,15 +184,15 @@ export default function AdminLeadsPage() {
           >
             <option value="all">All Statuses</option>
             <option value="new">New</option>
-            {/* <option value="read">Read</option> */}
+            {}
             <option value="replied">Replied</option>
             <option value="resolved">Resolved</option>
-            {/* <option value="spam">Spam</option> */}
+            {}
           </select>
         </div>
       </div>
 
-      { }
+      {}
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -242,8 +217,9 @@ export default function AdminLeadsPage() {
                 key={contact.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className={`p-4 hover:bg-slate-50 cursor-pointer transition-colors ${contact.status === "new" ? "bg-yellow-50/50" : ""
-                  }`}
+                className={`p-4 hover:bg-slate-50 cursor-pointer transition-colors ${
+                  contact.status === "new" ? "bg-yellow-50/50" : ""
+                }`}
                 onClick={() => {
                   setSelectedContact(contact);
                   if (contact.status === "new") {
@@ -252,12 +228,12 @@ export default function AdminLeadsPage() {
                 }}
               >
                 <div className="flex flex-col md:flex-row md:items-start gap-4">
-                  { }
+                  {}
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold flex-shrink-0">
                     {contact.name[0].toUpperCase()}
                   </div>
 
-                  { }
+                  {}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-1">
                       <h3 className="font-semibold text-slate-900">
@@ -299,7 +275,7 @@ export default function AdminLeadsPage() {
                     </div>
                   </div>
 
-                  { }
+                  {}
                   <div className="flex items-center gap-2">
                     <a
                       href={`mailto:${contact.email}?subject=Re: ${contact.subject || "Your message"}`}
@@ -325,7 +301,7 @@ export default function AdminLeadsPage() {
         )}
       </div>
 
-      { }
+      {}
       {selectedContact && (
         <div
           className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
@@ -351,7 +327,7 @@ export default function AdminLeadsPage() {
               </div>
             </div>
             <div className="p-6 space-y-6">
-              { }
+              {}
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xl font-bold">
                   {selectedContact.name[0].toUpperCase()}
@@ -371,7 +347,7 @@ export default function AdminLeadsPage() {
                 </span>
               </div>
 
-              { }
+              {}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="text-sm font-medium text-slate-500 mb-1">
@@ -399,7 +375,7 @@ export default function AdminLeadsPage() {
                 )}
               </div>
 
-              { }
+              {}
               <div>
                 <h4 className="text-sm font-medium text-slate-500 mb-1">
                   Subject
@@ -409,7 +385,7 @@ export default function AdminLeadsPage() {
                 </p>
               </div>
 
-              { }
+              {}
               <div>
                 <h4 className="text-sm font-medium text-slate-500 mb-2">
                   Message
@@ -419,12 +395,12 @@ export default function AdminLeadsPage() {
                 </div>
               </div>
 
-              { }
+              {}
               <p className="text-sm text-slate-400">
                 Received: {formatDate(selectedContact.createdAt)}
               </p>
 
-              { }
+              {}
               <div className="flex gap-3 pt-4 border-t border-slate-200">
                 <a
                   href={`mailto:${selectedContact.email}?subject=Re: ${selectedContact.subject || "Your message"}`}
@@ -438,7 +414,9 @@ export default function AdminLeadsPage() {
                   className={`px-4 py-2.5 border border-slate-200 rounded-lg hover:bg-slate-50 font-medium ${selectedContact.status === "resolved" ? "opacity-50 cursor-not-allowed" : ""}`}
                   disabled={selectedContact.status === "resolved"}
                 >
-                  {selectedContact.status === "resolved" ? "Resolved" : "Mark as Resolved"}
+                  {selectedContact.status === "resolved"
+                    ? "Resolved"
+                    : "Mark as Resolved"}
                 </button>
               </div>
             </div>

@@ -76,7 +76,9 @@ export async function sendEmail(options: EmailOptions): Promise<{
     console.warn("--- MOCK EMAIL START ---");
     console.warn("To:", options.to);
     console.warn("Subject:", options.subject);
-    console.warn("SMTP not configured. This email was only logged to the console.");
+    console.warn(
+      "SMTP not configured. This email was only logged to the console.",
+    );
     console.warn("--- MOCK EMAIL END ---");
     return { success: true, messageId: "mock-id-" + Date.now() };
   }
@@ -140,7 +142,7 @@ Reply to this email to respond directly to the customer.
     <h1 style="margin: 0; font-size: 24px;">New Contact Form Submission</h1>
     <p style="margin: 5px 0 0 0;">SPYAJ Marketing</p>
   </div>
-  
+
   <div style="background: #f8f9fa; padding: 20px; border: 1px solid #e9ecef;">
     <table style="width: 100%;">
       <tr><td style="padding: 10px 0;"><strong>Name:</strong></td><td>${data.name}</td></tr>
@@ -150,12 +152,12 @@ Reply to this email to respond directly to the customer.
       <tr><td style="padding: 10px 0;"><strong>Subject:</strong></td><td>${data.subject || "General Inquiry"}</td></tr>
     </table>
   </div>
-  
+
   <div style="background: white; padding: 20px; border: 1px solid #e9ecef; border-top: none;">
     <h3 style="margin-top: 0;">Message:</h3>
     <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; white-space: pre-wrap;">${data.message}</div>
   </div>
-  
+
   <div style="background: #f1f1f1; padding: 15px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 10px 10px;">
     <p style="margin: 0;">Reply to this email to respond directly to the customer.</p>
   </div>
@@ -204,13 +206,13 @@ Source: ${data.source || "Website"}
     <h1 style="margin: 0; font-size: 24px;">🔔 New Quote Request</h1>
     <p style="margin: 5px 0 0 0;">SPYAJ Marketing</p>
   </div>
-  
+
   <div style="background: #fff7ed; padding: 20px; border: 1px solid #fed7aa;">
     <h3 style="margin-top: 0;">📦 Product Requested</h3>
     <p style="font-size: 18px; font-weight: bold; margin: 0;">${data.productName}</p>
     ${data.category ? `<p style="margin: 5px 0 0 0; color: #666;">Category: ${data.category}</p>` : ""}
   </div>
-  
+
   <div style="background: #f8f9fa; padding: 20px; border: 1px solid #e9ecef; border-top: none;">
     <h3 style="margin-top: 0;">👤 Contact Information</h3>
     <table style="width: 100%;">
@@ -220,7 +222,7 @@ Source: ${data.source || "Website"}
       ${data.companyName ? `<tr><td style="padding: 8px 0;"><strong>Company:</strong></td><td>${data.companyName}</td></tr>` : ""}
     </table>
   </div>
-  
+
   <div style="background: white; padding: 20px; border: 1px solid #e9ecef; border-top: none;">
     <h3 style="margin-top: 0;">📋 Request Details</h3>
     <table style="width: 100%;">
@@ -228,15 +230,16 @@ Source: ${data.source || "Website"}
       ${data.targetBudget ? `<tr><td style="padding: 8px 0;"><strong>Budget:</strong></td><td>${data.targetBudget}</td></tr>` : ""}
       ${data.deliveryLocation ? `<tr><td style="padding: 8px 0;"><strong>Delivery:</strong></td><td>${data.deliveryLocation}</td></tr>` : ""}
     </table>
-    ${data.requirements
-      ? `
+    ${
+      data.requirements
+        ? `
     <h4 style="margin-bottom: 10px;">Requirements:</h4>
     <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; white-space: pre-wrap;">${data.requirements}</div>
     `
-      : ""
+        : ""
     }
   </div>
-  
+
   <div style="background: #f1f1f1; padding: 15px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 10px 10px;">
     <p style="margin: 0;">Source: ${data.source || "Website"}</p>
   </div>
@@ -369,11 +372,11 @@ The SPYAJ Marketing Team
     <h1 style="margin: 0; font-size: 24px;">Your Quote is Ready!</h1>
     <p style="margin: 5px 0 0 0;">SPYAJ Marketing</p>
   </div>
-  
+
   <div style="background: white; padding: 20px; border: 1px solid #e9ecef; border-top: none;">
     <p>Hello ${data.contactName},</p>
     <p>Thank you for your interest in <strong>${data.productName}</strong>. We are pleased to provide you with the following quote:</p>
-    
+
     <div style="background: #f0f9ff; padding: 20px; border-radius: 10px; margin: 20px 0; border: 1px solid #bae6fd;">
       <table style="width: 100%;">
         <tr><td style="padding: 5px 0;"><strong>Product:</strong></td><td>${data.productName}</td></tr>
@@ -381,13 +384,13 @@ The SPYAJ Marketing Team
         <tr><td style="padding: 5px 0;"><strong>Quoted Price:</strong></td><td style="font-size: 18px; color: #1e40af; font-weight: bold;">${data.quotePrice}</td></tr>
       </table>
     </div>
-    
+
     <p>If you have any questions or would like to proceed with the order, please reply to this email.</p>
-    
+
     <br/>
     <p>Best regards,<br/><strong>The SPYAJ Marketing Team</strong></p>
   </div>
-  
+
   <div style="background: #f1f1f1; padding: 15px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 10px 10px;">
     <p style="margin: 0;">&copy; ${new Date().getFullYear()} SPYAJ Marketing. All rights reserved.</p>
   </div>

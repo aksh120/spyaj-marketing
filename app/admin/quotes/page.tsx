@@ -119,7 +119,9 @@ export default function AdminQuotesPage() {
         prev.map((q) => (q.id === id ? { ...q, status: newStatus } : q)),
       );
       if (selectedQuote?.id === id) {
-        setSelectedQuote((prev) => (prev ? { ...prev, status: newStatus } : null));
+        setSelectedQuote((prev) =>
+          prev ? { ...prev, status: newStatus } : null,
+        );
       }
     } catch (error) {
       console.error("Failed to update status:", error);
@@ -187,11 +189,11 @@ export default function AdminQuotesPage() {
         prev.map((q) =>
           q.id === selectedQuote.id
             ? { ...q, status: "quoted", quoted_price: quotePrice }
-            : q
-        )
+            : q,
+        ),
       );
       setSelectedQuote((prev) =>
-        prev ? { ...prev, status: "quoted", quoted_price: quotePrice } : null
+        prev ? { ...prev, status: "quoted", quoted_price: quotePrice } : null,
       );
       setQuotePrice("");
       alert("Quote sent successfully!");
@@ -215,22 +217,23 @@ export default function AdminQuotesPage() {
 
   return (
     <div className="space-y-6">
-      { }
+      {}
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Quote Requests</h1>
         <p className="text-slate-500">Manage incoming quote and RFQ requests</p>
       </div>
 
-      { }
+      {}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {["open", "reviewing", "accepted", "rejected"].map((status) => (
           <button
             key={status}
             onClick={() => setStatusFilter(status)}
-            className={`p-4 rounded-xl border ${statusFilter === status
-              ? "border-blue-500 bg-blue-50"
-              : "border-slate-200 bg-white hover:bg-slate-50"
-              } transition-colors`}
+            className={`p-4 rounded-xl border ${
+              statusFilter === status
+                ? "border-blue-500 bg-blue-50"
+                : "border-slate-200 bg-white hover:bg-slate-50"
+            } transition-colors`}
           >
             <div className="flex items-center gap-2 mb-2">
               <div
@@ -249,7 +252,7 @@ export default function AdminQuotesPage() {
         ))}
       </div>
 
-      { }
+      {}
       <div className="bg-white rounded-xl border border-slate-200 p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
@@ -280,7 +283,7 @@ export default function AdminQuotesPage() {
         </div>
       </div>
 
-      { }
+      {}
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -314,7 +317,7 @@ export default function AdminQuotesPage() {
                 }}
               >
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
-                  { }
+                  {}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="font-semibold text-slate-900 truncate">
@@ -345,7 +348,7 @@ export default function AdminQuotesPage() {
                     </div>
                   </div>
 
-                  { }
+                  {}
                   <div className="flex items-center gap-4 text-sm">
                     {quote.quantity && (
                       <span className="px-3 py-1 bg-slate-100 rounded-lg">
@@ -379,7 +382,7 @@ export default function AdminQuotesPage() {
         )}
       </div>
 
-      { }
+      {}
       {selectedQuote && (
         <div
           className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
@@ -405,7 +408,7 @@ export default function AdminQuotesPage() {
               </div>
             </div>
             <div className="p-6 space-y-6">
-              { }
+              {}
               <div className="flex items-center gap-3">
                 <span
                   className={`px-3 py-1.5 rounded-full font-medium ${statusColors[selectedQuote.status].bg} ${statusColors[selectedQuote.status].text}`}
@@ -417,7 +420,7 @@ export default function AdminQuotesPage() {
                 </span>
               </div>
 
-              { }
+              {}
               <div>
                 <h3 className="text-sm font-medium text-slate-500 mb-2">
                   Product Requested
@@ -432,7 +435,7 @@ export default function AdminQuotesPage() {
                 )}
               </div>
 
-              { }
+              {}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 mb-2">
@@ -476,7 +479,7 @@ export default function AdminQuotesPage() {
                 )}
               </div>
 
-              { }
+              {}
               <div className="grid grid-cols-2 gap-4">
                 {selectedQuote.quantity && (
                   <div>
@@ -498,7 +501,7 @@ export default function AdminQuotesPage() {
                 )}
               </div>
 
-              { }
+              {}
               {selectedQuote.requirements && (
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 mb-2">
@@ -510,7 +513,8 @@ export default function AdminQuotesPage() {
                 </div>
               )}
 
-              {selectedQuote.status === "reviewing" || selectedQuote.status === "open" ? (
+              {selectedQuote.status === "reviewing" ||
+              selectedQuote.status === "open" ? (
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 mb-2">
                     Quote Price
@@ -525,43 +529,60 @@ export default function AdminQuotesPage() {
                     />
                   </div>
                 </div>
-              ) : selectedQuote.status === "quoted" || selectedQuote.status === "accepted" ? (
+              ) : selectedQuote.status === "quoted" ||
+                selectedQuote.status === "accepted" ? (
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 mb-2">
                     Quoted Price
                   </h3>
                   <p className="text-lg font-bold text-blue-600">
-                    {(selectedQuote as any).quoted_price || "Price not recorded"}
+                    {(selectedQuote as any).quoted_price ||
+                      "Price not recorded"}
                   </p>
                 </div>
               ) : null}
 
-              { }
+              {}
               <div className="flex gap-3 pt-4 border-t border-slate-200">
                 <button
                   onClick={handleSendQuote}
-                  disabled={isSending || selectedQuote.status === "quoted" || selectedQuote.status === "accepted"}
+                  disabled={
+                    isSending ||
+                    selectedQuote.status === "quoted" ||
+                    selectedQuote.status === "accepted"
+                  }
                   className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isSending ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : selectedQuote.status === "quoted" || selectedQuote.status === "accepted" ? (
+                  ) : selectedQuote.status === "quoted" ||
+                    selectedQuote.status === "accepted" ? (
                     "Quote Sent"
                   ) : (
                     "Send Quote"
                   )}
                 </button>
                 <button
-                  onClick={() => updateQuoteStatus(selectedQuote.id, "accepted")}
+                  onClick={() =>
+                    updateQuoteStatus(selectedQuote.id, "accepted")
+                  }
                   className="px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium disabled:opacity-50"
-                  disabled={selectedQuote.status === "accepted" || selectedQuote.status === "rejected"}
+                  disabled={
+                    selectedQuote.status === "accepted" ||
+                    selectedQuote.status === "rejected"
+                  }
                 >
                   Mark as Accepted
                 </button>
                 <button
-                  onClick={() => updateQuoteStatus(selectedQuote.id, "rejected")}
+                  onClick={() =>
+                    updateQuoteStatus(selectedQuote.id, "rejected")
+                  }
                   className="px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium disabled:opacity-50"
-                  disabled={selectedQuote.status === "rejected" || selectedQuote.status === "accepted"}
+                  disabled={
+                    selectedQuote.status === "rejected" ||
+                    selectedQuote.status === "accepted"
+                  }
                 >
                   Reject
                 </button>

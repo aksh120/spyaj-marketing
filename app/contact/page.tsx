@@ -17,57 +17,77 @@ import {
 import { useState } from "react";
 import { useFormValidation, useClientRateLimit } from "@/hooks/useSecurity";
 import { RateLimitPresets } from "@/lib/security";
-
-const contactMethods = [
-  {
-    icon: <MessageCircle className="w-5 h-5 md:w-6 md:h-6 text-primary" />,
-    title: "Live Chat",
-    desc: "Available 24/7 for urgent business support.",
-    action: "Start Chat",
-    color: "from-blue-500/20 to-blue-600/10",
-  },
-  {
-    icon: <Mail className="w-5 h-5 md:w-6 md:h-6 text-primary" />,
-    title: "Email Support",
-    desc: "support@spyaj.com - Response within 24h.",
-    action: "Send Email",
-    color: "from-green-500/20 to-green-600/10",
-  },
-  {
-    icon: <Phone className="w-5 h-5 md:w-6 md:h-6 text-primary" />,
-    title: "Phone Support",
-    desc: "+91 (123) 456-7890 - Trade assistance.",
-    action: "Call Now",
-    color: "from-yellow-500/20 to-yellow-600/10",
-  },
-  {
-    icon: <Clock className="w-5 h-5 md:w-6 md:h-6 text-primary" />,
-    title: "Business Hours",
-    desc: "Mon - Fri: 9 AM to 6 PM (IST).",
-    action: "View Schedule",
-    color: "from-orange-500/20 to-orange-600/10",
-  },
-];
-
-const faqs = [
-  {
-    q: "How do I become a seller?",
-    a: "Register on our platform, complete verification, and start listing your products.",
-  },
-  {
-    q: "What payment methods are accepted?",
-    a: "We accept bank transfers, cards, UPI, and escrow payments for secure transactions.",
-  },
-  {
-    q: "How long does shipping take?",
-    a: "Domestic orders: 3-7 days. International: 10-21 days depending on destination.",
-  },
-];
+import useSiteContent from "@/hooks/useSiteContent";
 
 export default function Contact() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+  const { get } = useSiteContent(["contact", "global"]);
+
+  const contactMethods = [
+    {
+      icon: <MessageCircle className="w-5 h-5 md:w-6 md:h-6 text-primary" />,
+      title: get("contact_method_1_title", "Live Chat"),
+      desc: get(
+        "contact_method_1_desc",
+        "Available 24/7 for urgent business support.",
+      ),
+      action: get("contact_method_1_action", "Start Chat"),
+      color: "from-blue-500/20 to-blue-600/10",
+    },
+    {
+      icon: <Mail className="w-5 h-5 md:w-6 md:h-6 text-primary" />,
+      title: get("contact_method_2_title", "Email Support"),
+      desc: get(
+        "contact_method_2_desc",
+        "support@spyaj.com - Response within 24h.",
+      ),
+      action: get("contact_method_2_action", "Send Email"),
+      color: "from-green-500/20 to-green-600/10",
+    },
+    {
+      icon: <Phone className="w-5 h-5 md:w-6 md:h-6 text-primary" />,
+      title: get("contact_method_3_title", "Phone Support"),
+      desc: get(
+        "contact_method_3_desc",
+        "+91 (123) 456-7890 - Trade assistance.",
+      ),
+      action: get("contact_method_3_action", "Call Now"),
+      color: "from-yellow-500/20 to-yellow-600/10",
+    },
+    {
+      icon: <Clock className="w-5 h-5 md:w-6 md:h-6 text-primary" />,
+      title: get("contact_method_4_title", "Business Hours"),
+      desc: get("contact_method_4_desc", "Mon - Fri: 9 AM to 6 PM (IST)."),
+      action: get("contact_method_4_action", "View Schedule"),
+      color: "from-orange-500/20 to-orange-600/10",
+    },
+  ];
+
+  const faqs = [
+    {
+      q: get("contact_faq_1_q", "How do I become a seller?"),
+      a: get(
+        "contact_faq_1_a",
+        "Register on our platform, complete verification, and start listing your products.",
+      ),
+    },
+    {
+      q: get("contact_faq_2_q", "What payment methods are accepted?"),
+      a: get(
+        "contact_faq_2_a",
+        "We accept bank transfers, cards, UPI, and escrow payments for secure transactions.",
+      ),
+    },
+    {
+      q: get("contact_faq_3_q", "How long does shipping take?"),
+      a: get(
+        "contact_faq_3_a",
+        "Domestic orders: 3-7 days. International: 10-21 days depending on destination.",
+      ),
+    },
+  ];
 
   const rateLimit = useClientRateLimit({
     key: "contact-form",
@@ -150,7 +170,7 @@ export default function Contact() {
           transition={{ delay: 0.3 }}
           className="text-2xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-4"
         >
-          Get in Touch
+          {get("contact_hero_title", "Get in Touch")}
         </motion.h1>
         <motion.p
           initial={{ opacity: 0 }}
@@ -158,8 +178,10 @@ export default function Contact() {
           transition={{ delay: 0.4 }}
           className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto"
         >
-          "Connect. Trade. Grow." - Let us help you connect with the right
-          business partners.
+          {get(
+            "contact_hero_subtitle",
+            '"Connect. Trade. Grow." - Let us help you connect with the right business partners.',
+          )}
         </motion.p>
       </motion.div>
 
@@ -211,7 +233,7 @@ export default function Contact() {
           >
             <h3 className="font-bold text-base md:text-xl mb-3 md:mb-4 flex items-center gap-2">
               <MapPin className="w-5 h-5 text-primary" />
-              Visit Our Headquarters
+              {get("contact_address_title", "Visit Our Headquarters")}
             </h3>
             <div className="flex gap-3 md:gap-4 text-muted-foreground">
               <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/20 rounded-xl flex-shrink-0 flex items-center justify-center">
@@ -224,12 +246,18 @@ export default function Contact() {
               </div>
               <div>
                 <p className="text-sm md:text-base font-semibold text-foreground mb-1">
-                  SPYAJ Marketing Pvt. Ltd.
+                  {get("contact_company_name", "SPYAJ Marketing Pvt. Ltd.")}
                 </p>
                 <p className="text-sm md:text-base">
-                  123 Business, Industrial Zone,
+                  {get(
+                    "contact_address_line1",
+                    "123 Business, Industrial Zone,",
+                  )}
                   <br />
-                  Pune, Maharashtra, India - 364001
+                  {get(
+                    "contact_address_line2",
+                    "Pune, Maharashtra, India - 364001",
+                  )}
                 </p>
               </div>
             </div>

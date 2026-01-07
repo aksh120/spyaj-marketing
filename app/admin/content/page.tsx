@@ -504,7 +504,7 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
     section: "trust",
     description: "Trade guarantee text",
   },
-  // New Home Page - Hero Section
+
   {
     key: "home_hero_badge",
     content_type: "text",
@@ -524,7 +524,8 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
   {
     key: "home_hero_subtitle",
     content_type: "text",
-    value: "Connect with 10,000+ verified factories. Experience AI-powered sourcing, real-time tracking, and bank-grade security.",
+    value:
+      "Connect with 10,000+ verified factories. Experience AI-powered sourcing, real-time tracking, and bank-grade security.",
     page: "home",
     section: "hero",
     description: "Hero section description paragraph",
@@ -545,7 +546,7 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
     section: "hero",
     description: "Secondary CTA button text in hero",
   },
-  // Trust Bar Features
+
   {
     key: "home_trust_feature_1_title",
     content_type: "text",
@@ -610,7 +611,7 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
     section: "trust",
     description: "Trust bar feature 4 description",
   },
-  // How It Works Section
+
   {
     key: "home_hiw_title",
     content_type: "text",
@@ -691,7 +692,7 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
     section: "how_it_works",
     description: "Step 4 description",
   },
-  // Stats Section
+
   {
     key: "home_stats_suppliers_value",
     content_type: "text",
@@ -788,7 +789,7 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
     section: "stats",
     description: "Orders stat label",
   },
-  // Testimonials Section
+
   {
     key: "home_testimonials_title",
     content_type: "text",
@@ -824,7 +825,8 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
   {
     key: "home_testimonial_1_quote",
     content_type: "text",
-    value: "SPYAJ revolutionized our procurement process. We reduced costs by 30% while maintaining quality standards.",
+    value:
+      "SPYAJ revolutionized our procurement process. We reduced costs by 30% while maintaining quality standards.",
     page: "home",
     section: "testimonials",
     description: "Testimonial 1 - Quote text",
@@ -848,7 +850,8 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
   {
     key: "home_testimonial_2_quote",
     content_type: "text",
-    value: "The verified supplier network gave us confidence in every transaction. Outstanding platform for B2B trade.",
+    value:
+      "The verified supplier network gave us confidence in every transaction. Outstanding platform for B2B trade.",
     page: "home",
     section: "testimonials",
     description: "Testimonial 2 - Quote text",
@@ -872,12 +875,13 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
   {
     key: "home_testimonial_3_quote",
     content_type: "text",
-    value: "From finding suppliers to closing deals, SPYAJ made international sourcing seamless and secure.",
+    value:
+      "From finding suppliers to closing deals, SPYAJ made international sourcing seamless and secure.",
     page: "home",
     section: "testimonials",
     description: "Testimonial 3 - Quote text",
   },
-  // FAQ Section
+
   {
     key: "home_faq_title",
     content_type: "text",
@@ -905,7 +909,8 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
   {
     key: "home_faq_1_a",
     content_type: "text",
-    value: "MOQ varies by supplier and product. Most suppliers offer flexible MOQs starting from as low as 10 units for samples and 100+ units for bulk orders.",
+    value:
+      "MOQ varies by supplier and product. Most suppliers offer flexible MOQs starting from as low as 10 units for samples and 100+ units for bulk orders.",
     page: "home",
     section: "faq",
     description: "FAQ 1 - Answer",
@@ -921,7 +926,8 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
   {
     key: "home_faq_2_a",
     content_type: "text",
-    value: "All suppliers undergo KYC verification, factory audits, and receive badges based on their verification level (Gold, Silver, Bronze). Look for the verified badge on supplier profiles.",
+    value:
+      "All suppliers undergo KYC verification, factory audits, and receive badges based on their verification level (Gold, Silver, Bronze). Look for the verified badge on supplier profiles.",
     page: "home",
     section: "faq",
     description: "FAQ 2 - Answer",
@@ -937,7 +943,8 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
   {
     key: "home_faq_3_a",
     content_type: "text",
-    value: "We support bank transfers, credit/debit cards, UPI, and escrow payments. Trade Assurance protects your payment until order delivery.",
+    value:
+      "We support bank transfers, credit/debit cards, UPI, and escrow payments. Trade Assurance protects your payment until order delivery.",
     page: "home",
     section: "faq",
     description: "FAQ 3 - Answer",
@@ -953,7 +960,8 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
   {
     key: "home_faq_4_a",
     content_type: "text",
-    value: "Domestic orders typically take 3-7 business days. International shipping varies by destination (7-21 days). Express options available.",
+    value:
+      "Domestic orders typically take 3-7 business days. International shipping varies by destination (7-21 days). Express options available.",
     page: "home",
     section: "faq",
     description: "FAQ 4 - Answer",
@@ -969,12 +977,13 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
   {
     key: "home_faq_5_a",
     content_type: "text",
-    value: "Yes! Most suppliers offer sample orders. Use the 'Request Sample' button on product pages to get samples before bulk ordering.",
+    value:
+      "Yes! Most suppliers offer sample orders. Use the 'Request Sample' button on product pages to get samples before bulk ordering.",
     page: "home",
     section: "faq",
     description: "FAQ 5 - Answer",
   },
-  // Newsletter Section
+
   {
     key: "home_newsletter_title",
     content_type: "text",
@@ -986,7 +995,8 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
   {
     key: "home_newsletter_subtitle",
     content_type: "text",
-    value: "Get the latest industry news, exclusive deals, and sourcing tips delivered to your inbox.",
+    value:
+      "Get the latest industry news, exclusive deals, and sourcing tips delivered to your inbox.",
     page: "home",
     section: "newsletter",
     description: "Newsletter section description",
@@ -1007,7 +1017,7 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
     section: "newsletter",
     description: "Newsletter input placeholder text",
   },
-  // CTA Section
+
   {
     key: "home_cta_title",
     content_type: "text",
@@ -1019,7 +1029,8 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
   {
     key: "home_cta_subtitle",
     content_type: "text",
-    value: "Join thousands of businesses sourcing smarter with SPYAJ. Start your journey today.",
+    value:
+      "Join thousands of businesses sourcing smarter with SPYAJ. Start your journey today.",
     page: "home",
     section: "cta",
     description: "Final CTA section subtitle",
@@ -1040,7 +1051,7 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
     section: "cta",
     description: "Secondary CTA button text",
   },
-  // Buyer Benefits Section
+
   {
     key: "home_benefits_title",
     content_type: "text",
@@ -1153,7 +1164,7 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
     section: "benefits",
     description: "Benefit 6 description",
   },
-  // Industries Section
+
   {
     key: "home_industries_title",
     content_type: "text",
@@ -1165,7 +1176,8 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
   {
     key: "home_industries_subtitle",
     content_type: "text",
-    value: "Find verified suppliers across 50+ industries. From raw materials to finished goods.",
+    value:
+      "Find verified suppliers across 50+ industries. From raw materials to finished goods.",
     page: "home",
     section: "industries",
     description: "Industries section subtitle",
@@ -1178,7 +1190,7 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
     section: "industries",
     description: "Industries section badge text",
   },
-  // RFQ Section on Home
+
   {
     key: "home_rfq_title",
     content_type: "text",
@@ -1190,7 +1202,8 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
   {
     key: "home_rfq_subtitle",
     content_type: "text",
-    value: "Tell us what you need. Our network of 10,000+ suppliers will compete to offer you the best prices.",
+    value:
+      "Tell us what you need. Our network of 10,000+ suppliers will compete to offer you the best prices.",
     page: "home",
     section: "rfq",
     description: "RFQ section subtitle on homepage",
@@ -1210,6 +1223,382 @@ const defaultContentItems: Omit<SiteContent, "id">[] = [
     page: "home",
     section: "rfq",
     description: "RFQ submit button text on homepage",
+  },
+
+  {
+    key: "home_suppliers_title",
+    content_type: "text",
+    value: "Featured Suppliers",
+    page: "home",
+    section: "suppliers",
+    description: "Featured suppliers section title",
+  },
+  {
+    key: "home_suppliers_subtitle",
+    content_type: "text",
+    value: "Top-rated verified suppliers with excellent track records",
+    page: "home",
+    section: "suppliers",
+    description: "Featured suppliers section subtitle",
+  },
+  {
+    key: "home_suppliers_badge",
+    content_type: "text",
+    value: "⭐ Top Rated",
+    page: "home",
+    section: "suppliers",
+    description: "Featured suppliers badge text",
+  },
+
+  {
+    key: "home_verification_title",
+    content_type: "text",
+    value: "Supplier Verification",
+    page: "home",
+    section: "verification",
+    description: "Verification tiers section title",
+  },
+  {
+    key: "home_verification_subtitle",
+    content_type: "text",
+    value:
+      "Every supplier is verified through our rigorous multi-level process",
+    page: "home",
+    section: "verification",
+    description: "Verification tiers section subtitle",
+  },
+
+  {
+    key: "home_partners_title",
+    content_type: "text",
+    value: "Trusted by Leading Brands",
+    page: "home",
+    section: "partners",
+    description: "Partner logos section title",
+  },
+
+  {
+    key: "home_livetrade_title",
+    content_type: "text",
+    value: "Live Trade Activity",
+    page: "home",
+    section: "livetrade",
+    description: "Live trade feed title",
+  },
+  {
+    key: "home_livetrade_subtitle",
+    content_type: "text",
+    value: "Real-time transactions happening on SPYAJ",
+    page: "home",
+    section: "livetrade",
+    description: "Live trade feed subtitle",
+  },
+
+  {
+    key: "contact_hero_title",
+    content_type: "text",
+    value: "Get in Touch",
+    page: "contact",
+    section: "hero",
+    description: "Contact page main title",
+  },
+  {
+    key: "contact_hero_subtitle",
+    content_type: "text",
+    value:
+      "Connect. Trade. Grow. - Let us help you connect with the right business partners.",
+    page: "contact",
+    section: "hero",
+    description: "Contact page subtitle/tagline",
+  },
+
+  {
+    key: "contact_method_1_title",
+    content_type: "text",
+    value: "Live Chat",
+    page: "contact",
+    section: "methods",
+    description: "Contact method 1 - title",
+  },
+  {
+    key: "contact_method_1_desc",
+    content_type: "text",
+    value: "Available 24/7 for urgent business support.",
+    page: "contact",
+    section: "methods",
+    description: "Contact method 1 - description",
+  },
+  {
+    key: "contact_method_1_action",
+    content_type: "text",
+    value: "Start Chat",
+    page: "contact",
+    section: "methods",
+    description: "Contact method 1 - action button text",
+  },
+  {
+    key: "contact_method_2_title",
+    content_type: "text",
+    value: "Email Support",
+    page: "contact",
+    section: "methods",
+    description: "Contact method 2 - title",
+  },
+  {
+    key: "contact_method_2_desc",
+    content_type: "text",
+    value: "support@spyaj.com - Response within 24h.",
+    page: "contact",
+    section: "methods",
+    description: "Contact method 2 - description",
+  },
+  {
+    key: "contact_method_2_action",
+    content_type: "text",
+    value: "Send Email",
+    page: "contact",
+    section: "methods",
+    description: "Contact method 2 - action button text",
+  },
+  {
+    key: "contact_method_3_title",
+    content_type: "text",
+    value: "Phone Support",
+    page: "contact",
+    section: "methods",
+    description: "Contact method 3 - title",
+  },
+  {
+    key: "contact_method_3_desc",
+    content_type: "text",
+    value: "+91 (123) 456-7890 - Trade assistance.",
+    page: "contact",
+    section: "methods",
+    description: "Contact method 3 - description",
+  },
+  {
+    key: "contact_method_3_action",
+    content_type: "text",
+    value: "Call Now",
+    page: "contact",
+    section: "methods",
+    description: "Contact method 3 - action button text",
+  },
+  {
+    key: "contact_method_4_title",
+    content_type: "text",
+    value: "Business Hours",
+    page: "contact",
+    section: "methods",
+    description: "Contact method 4 - title",
+  },
+  {
+    key: "contact_method_4_desc",
+    content_type: "text",
+    value: "Mon - Fri: 9 AM to 6 PM (IST).",
+    page: "contact",
+    section: "methods",
+    description: "Contact method 4 - description",
+  },
+  {
+    key: "contact_method_4_action",
+    content_type: "text",
+    value: "View Schedule",
+    page: "contact",
+    section: "methods",
+    description: "Contact method 4 - action button text",
+  },
+
+  {
+    key: "contact_address_title",
+    content_type: "text",
+    value: "Visit Our Headquarters",
+    page: "contact",
+    section: "address",
+    description: "Address section title",
+  },
+  {
+    key: "contact_company_name",
+    content_type: "text",
+    value: "SPYAJ Marketing Pvt. Ltd.",
+    page: "contact",
+    section: "address",
+    description: "Company name displayed on contact page",
+  },
+  {
+    key: "contact_address_line1",
+    content_type: "text",
+    value: "123 Business, Industrial Zone,",
+    page: "contact",
+    section: "address",
+    description: "Address line 1",
+  },
+  {
+    key: "contact_address_line2",
+    content_type: "text",
+    value: "Pune, Maharashtra, India - 364001",
+    page: "contact",
+    section: "address",
+    description: "Address line 2 (city, state, pincode)",
+  },
+
+  {
+    key: "contact_form_title",
+    content_type: "text",
+    value: "Send Us a Message",
+    page: "contact",
+    section: "form",
+    description: "Contact form section title",
+  },
+  {
+    key: "contact_form_subtitle",
+    content_type: "text",
+    value:
+      "We'd love to hear from you! Fill out the form and we'll get back to you shortly.",
+    page: "contact",
+    section: "form",
+    description: "Contact form section subtitle",
+  },
+  {
+    key: "contact_form_name_label",
+    content_type: "text",
+    value: "Your Name",
+    page: "contact",
+    section: "form",
+    description: "Contact form - name field label",
+  },
+  {
+    key: "contact_form_email_label",
+    content_type: "text",
+    value: "Email Address",
+    page: "contact",
+    section: "form",
+    description: "Contact form - email field label",
+  },
+  {
+    key: "contact_form_subject_label",
+    content_type: "text",
+    value: "Subject",
+    page: "contact",
+    section: "form",
+    description: "Contact form - subject field label",
+  },
+  {
+    key: "contact_form_message_label",
+    content_type: "text",
+    value: "Your Message",
+    page: "contact",
+    section: "form",
+    description: "Contact form - message field label",
+  },
+  {
+    key: "contact_form_submit_button",
+    content_type: "text",
+    value: "Send Message",
+    page: "contact",
+    section: "form",
+    description: "Contact form submit button text",
+  },
+  {
+    key: "contact_form_success_message",
+    content_type: "text",
+    value: "Message Sent Successfully!",
+    page: "contact",
+    section: "form",
+    description: "Success message after form submission",
+  },
+  {
+    key: "contact_form_success_description",
+    content_type: "text",
+    value: "We'll get back to you within 24 hours.",
+    page: "contact",
+    section: "form",
+    description: "Success description after form submission",
+  },
+
+  {
+    key: "contact_faq_title",
+    content_type: "text",
+    value: "Frequently Asked Questions",
+    page: "contact",
+    section: "faq",
+    description: "FAQ section title on contact page",
+  },
+  {
+    key: "contact_faq_1_q",
+    content_type: "text",
+    value: "How do I become a seller?",
+    page: "contact",
+    section: "faq",
+    description: "Contact FAQ 1 - Question",
+  },
+  {
+    key: "contact_faq_1_a",
+    content_type: "text",
+    value:
+      "Register on our platform, complete verification, and start listing your products.",
+    page: "contact",
+    section: "faq",
+    description: "Contact FAQ 1 - Answer",
+  },
+  {
+    key: "contact_faq_2_q",
+    content_type: "text",
+    value: "What payment methods are accepted?",
+    page: "contact",
+    section: "faq",
+    description: "Contact FAQ 2 - Question",
+  },
+  {
+    key: "contact_faq_2_a",
+    content_type: "text",
+    value:
+      "We accept bank transfers, cards, UPI, and escrow payments for secure transactions.",
+    page: "contact",
+    section: "faq",
+    description: "Contact FAQ 2 - Answer",
+  },
+  {
+    key: "contact_faq_3_q",
+    content_type: "text",
+    value: "How long does shipping take?",
+    page: "contact",
+    section: "faq",
+    description: "Contact FAQ 3 - Question",
+  },
+  {
+    key: "contact_faq_3_a",
+    content_type: "text",
+    value:
+      "Domestic orders: 3-7 days. International: 10-21 days depending on destination.",
+    page: "contact",
+    section: "faq",
+    description: "Contact FAQ 3 - Answer",
+  },
+
+  {
+    key: "global_email",
+    content_type: "text",
+    value: "support@spyaj.com",
+    page: "global",
+    section: "contact",
+    description: "Global support email address",
+  },
+  {
+    key: "global_phone",
+    content_type: "text",
+    value: "+91 (123) 456-7890",
+    page: "global",
+    section: "contact",
+    description: "Global support phone number",
+  },
+  {
+    key: "global_whatsapp",
+    content_type: "text",
+    value: "+919876543210",
+    page: "global",
+    section: "contact",
+    description: "WhatsApp business number",
   },
 ];
 
@@ -1377,9 +1766,47 @@ export default function AdminContentPage() {
     ),
   );
 
+  const pageOrder = [
+    "home",
+    "global",
+    "about",
+    "contact",
+    "landing",
+    "social",
+    "seo",
+    "seller",
+  ];
+
+  const sortedFilteredGroups = filteredGroups.sort(([pageA], [pageB]) => {
+    const indexA = pageOrder.indexOf(pageA);
+    const indexB = pageOrder.indexOf(pageB);
+
+    const orderA = indexA === -1 ? 999 : indexA;
+    const orderB = indexB === -1 ? 999 : indexB;
+    return orderA - orderB;
+  });
+
+  const sortedGroupedContent = Object.entries(groupedContent).sort(
+    ([pageA], [pageB]) => {
+      const indexA = pageOrder.indexOf(pageA);
+      const indexB = pageOrder.indexOf(pageB);
+      const orderA = indexA === -1 ? 999 : indexA;
+      const orderB = indexB === -1 ? 999 : indexB;
+      return orderA - orderB;
+    },
+  );
+
+  const scrollToSection = (page: string) => {
+    const element = document.getElementById(`section-${page}`);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   const pageLabels: Record<string, string> = {
+    home: "🏠 Home Page",
     global: "🌐 Global Settings",
-    landing: "🏠 Landing Page",
+    landing: "📄 Landing Page",
     about: "ℹ️ About Page",
     contact: "📞 Contact Page",
     social: "📱 Social Media",
@@ -1390,7 +1817,7 @@ export default function AdminContentPage() {
 
   return (
     <div className="space-y-6">
-      { }
+      {}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Site Content</h1>
@@ -1420,22 +1847,25 @@ export default function AdminContentPage() {
         </div>
       </div>
 
-      { }
+      {}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-        {Object.entries(groupedContent).map(([page, items]) => (
-          <div
+        {sortedGroupedContent.map(([page, items]) => (
+          <button
             key={page}
-            className="bg-white p-3 rounded-xl border border-slate-200 text-center"
+            onClick={() => scrollToSection(page)}
+            className="bg-white p-3 rounded-xl border border-slate-200 text-center hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer group"
           >
-            <p className="text-xs font-medium text-slate-500 capitalize">
+            <p className="text-xs font-medium text-slate-500 capitalize group-hover:text-blue-600">
               {page}
             </p>
-            <p className="text-xl font-bold text-slate-900">{items.length}</p>
-          </div>
+            <p className="text-xl font-bold text-slate-900 group-hover:text-blue-700">
+              {items.length}
+            </p>
+          </button>
         ))}
       </div>
 
-      { }
+      {}
       <div className="bg-white rounded-xl border border-slate-200 p-4">
         <div className="relative">
           <Search
@@ -1452,12 +1882,12 @@ export default function AdminContentPage() {
         </div>
       </div>
 
-      { }
+      {}
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
         </div>
-      ) : filteredGroups.length === 0 ? (
+      ) : sortedFilteredGroups.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-xl border border-slate-200">
           <Settings className="w-16 h-16 mx-auto mb-4 text-slate-300" />
           <h3 className="text-lg font-medium text-slate-900 mb-2">
@@ -1466,14 +1896,15 @@ export default function AdminContentPage() {
           <p className="text-slate-500">Try adjusting your search</p>
         </div>
       ) : (
-        filteredGroups.map(([page, items]) => (
+        sortedFilteredGroups.map(([page, items]) => (
           <motion.div
             key={page}
+            id={`section-${page}`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl border border-slate-200 overflow-hidden"
+            className="bg-white rounded-xl border border-slate-200 overflow-hidden scroll-mt-24"
           >
-            { }
+            {}
             <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <h2 className="font-semibold text-slate-900">
                 {pageLabels[page] || page}
@@ -1483,7 +1914,7 @@ export default function AdminContentPage() {
               </span>
             </div>
 
-            { }
+            {}
             <div className="divide-y divide-slate-100">
               {items
                 .filter(
@@ -1507,7 +1938,7 @@ export default function AdminContentPage() {
                   return (
                     <div key={item.id} className="p-4 sm:p-5">
                       <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                        { }
+                        {}
                         <div className="sm:w-56 flex-shrink-0">
                           <div className="flex items-center gap-2 mb-1">
                             <span
@@ -1529,7 +1960,7 @@ export default function AdminContentPage() {
                           )}
                         </div>
 
-                        { }
+                        {}
                         <div className="flex-1">
                           {item.content_type === "html" ? (
                             <textarea
@@ -1571,14 +2002,15 @@ export default function AdminContentPage() {
                           )}
                         </div>
 
-                        { }
+                        {}
                         <button
                           onClick={() => handleSave(item)}
                           disabled={!hasChanges || saving === item.id}
-                          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors flex-shrink-0 ${hasChanges
-                            ? "bg-blue-600 text-white hover:bg-blue-700"
-                            : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                            }`}
+                          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors flex-shrink-0 ${
+                            hasChanges
+                              ? "bg-blue-600 text-white hover:bg-blue-700"
+                              : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                          }`}
                         >
                           {saving === item.id ? (
                             <Loader2 size={16} className="animate-spin" />
@@ -1604,7 +2036,7 @@ export default function AdminContentPage() {
         ))
       )}
 
-      { }
+      {}
       <AnimatePresence>
         {showAddModal && (
           <>

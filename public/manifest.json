@@ -1,53 +1,50 @@
 {
-    "name": "SPYAJ Marketing",
-    "short_name": "SPYAJ",
-    "description": "Connect. Trade. Grow. India's Most Trusted B2B Marketplace",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#2563eb",
-    "orientation": "portrait-primary",
-    "icons": [
+  "name": "SPYAJ Marketing",
+  "short_name": "SPYAJ",
+  "description": "Connect. Trade. Grow. India's Most Trusted B2B Marketplace",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "shopping"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Marketplace",
+      "short_name": "Shop",
+      "url": "/marketplace",
+      "icons": [
         {
-            "src": "/logo.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "/logo.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
+          "src": "/logo.png",
+          "sizes": "96x96"
         }
-    ],
-    "categories": [
-        "business",
-        "shopping"
-    ],
-    "screenshots": [],
-    "shortcuts": [
+      ]
+    },
+    {
+      "name": "Submit RFQ",
+      "short_name": "RFQ",
+      "url": "/rfq",
+      "icons": [
         {
-            "name": "Marketplace",
-            "short_name": "Shop",
-            "url": "/marketplace",
-            "icons": [
-                {
-                    "src": "/logo.png",
-                    "sizes": "96x96"
-                }
-            ]
-        },
-        {
-            "name": "Submit RFQ",
-            "short_name": "RFQ",
-            "url": "/rfq",
-            "icons": [
-                {
-                    "src": "/logo.png",
-                    "sizes": "96x96"
-                }
-            ]
+          "src": "/logo.png",
+          "sizes": "96x96"
         }
-    ]
+      ]
+    }
+  ]
 }
