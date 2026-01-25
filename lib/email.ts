@@ -46,7 +46,7 @@ const createTransporter = () => {
   return nodemailer.createTransport({
     host,
     port,
-    secure: true,
+    secure: process.env.SMTP_SECURE === "true",
     auth: {
       user,
       pass,
@@ -54,8 +54,9 @@ const createTransporter = () => {
     tls: {
       rejectUnauthorized: false,
     },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
+    connectionTimeout: 30000,
+    greetingTimeout: 30000, // Increased wait time for server greeting
+    socketTimeout: 30000,
   });
 };
 
