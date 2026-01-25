@@ -54,9 +54,9 @@ const createTransporter = () => {
     tls: {
       rejectUnauthorized: false,
     },
-    connectionTimeout: 60000, // 60 seconds
-    greetingTimeout: 60000, // 60 seconds
-    socketTimeout: 60000, // 60 seconds
+    connectionTimeout: 30000,
+    greetingTimeout: 30000, // Increased wait time for server greeting
+    socketTimeout: 30000,
   });
 };
 
@@ -89,34 +89,25 @@ export async function sendEmail(options: EmailOptions): Promise<{
 
   const from = process.env.SMTP_FROM || process.env.SMTP_USER;
 
-  let lastError: any;
-  // Retry up to 3 times
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      console.log(`Sending email attempt ${attempt}/3...`);
-      const info = await transport.sendMail({
-        from: `SPYAJ Marketing <${from}>`,
-        to: Array.isArray(options.to) ? options.to.join(", ") : options.to,
-        subject: options.subject,
-        text: options.text,
-        html: options.html,
-        replyTo: options.replyTo,
-      });
+  try {
+    const info = await transport.sendMail({
+      from: `SPYAJ Marketing <${from}>`,
+      to: Array.isArray(options.to) ? options.to.join(", ") : options.to,
+      subject: options.subject,
+      text: options.text,
+      html: options.html,
+      replyTo: options.replyTo,
+    });
 
-      console.log("Email sent:", info.messageId);
-      return { success: true, messageId: info.messageId };
-    } catch (error) {
-      console.error(`Email send attempt ${attempt} failed:`, error);
-      lastError = error;
-      // Wait 2 seconds before retrying
-      if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, 2000));
-    }
+    console.log("Email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Email send error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
-
-  return {
-    success: false,
-    error: lastError instanceof Error ? lastError.message : "Final attempt failed",
-  };
 }
 
 export function generateContactNotificationEmail(data: ContactEmailData): {
@@ -275,10 +266,8 @@ export async function sendContactNotification(
 
   const { subject, text, html } = generateContactNotificationEmail(data);
 
-  const recipients = [adminEmail, "records.akshat@gmail.com"];
-
   const result = await sendEmail({
-    to: recipients,
+    to: adminEmail,
     subject,
     text,
     html,
@@ -322,10 +311,8 @@ export async function sendQuoteNotification(
 
   const { subject, text, html } = generateQuoteNotificationEmail(data);
 
-  const recipients = [adminEmail, "records.akshat@gmail.com"];
-
   const result = await sendEmail({
-    to: recipients,
+    to: adminEmail,
     subject,
     text,
     html,
