@@ -51,6 +51,9 @@ const createTransporter = () => {
       user,
       pass,
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
     connectionTimeout: 10000,
     greetingTimeout: 10000,
   });
@@ -230,13 +233,12 @@ Source: ${data.source || "Website"}
       ${data.targetBudget ? `<tr><td style="padding: 8px 0;"><strong>Budget:</strong></td><td>${data.targetBudget}</td></tr>` : ""}
       ${data.deliveryLocation ? `<tr><td style="padding: 8px 0;"><strong>Delivery:</strong></td><td>${data.deliveryLocation}</td></tr>` : ""}
     </table>
-    ${
-      data.requirements
-        ? `
+    ${data.requirements
+      ? `
     <h4 style="margin-bottom: 10px;">Requirements:</h4>
     <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; white-space: pre-wrap;">${data.requirements}</div>
     `
-        : ""
+      : ""
     }
   </div>
 
